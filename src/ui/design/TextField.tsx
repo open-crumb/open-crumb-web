@@ -28,13 +28,19 @@ type InputProps = {
   max?: string;
   id?: string;
   'aria-label'?: string;
+  variant?: 'normal' | 'title';
 };
 
 export const Input = React.forwardRef<React.ElementRef<'input'>, InputProps>(
-  ({ type = 'text', onChange, align = 'left', ...props }, forwardedRef) => (
+  (
+    { type = 'text', onChange, align = 'left', variant = 'normal', ...props },
+    forwardedRef,
+  ) => (
     <input
       className={classNames('block', 'w-full', 'outline-none', 'h-10', {
         'text-right': align === 'right',
+        'font-semibold': variant === 'title',
+        'text-lg': variant === 'title',
       })}
       type={type}
       onChange={(event) => onChange(event.target.value, event)}

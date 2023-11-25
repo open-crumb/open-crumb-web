@@ -6,21 +6,43 @@
  */
 'use client';
 
-import Heading from '@/ui/design/Heading';
-import { useLogbookEntry } from '@/ui/core/logbook/LogbookContext';
+import {
+  setLogbookEntry,
+  useLogbookEntry,
+} from '@/ui/core/logbook/LogbookContext';
 import LogbookUpdate from '@/ui/core/logbook/entry/LogbookUpdate';
+import TextField from '@/ui/design/TextField';
+import TextArea from '@/ui/design/TextArea';
 
 type Props = {
-  entryID: string;
+  id: string;
 };
 
-export default function LogbookBlock(props: Props) {
-  const entry = useLogbookEntry(props.entryID);
+export default function LogbookEntryBlock(props: Props) {
+  const entry = useLogbookEntry(props.id);
 
   return (
     <>
-      <Heading level="2">{entry.entity.title}</Heading>
-      {entry.entity.description && <p>{entry.entity.description}</p>}
+      <TextField.Input
+        value={entry.entity.title}
+        onChange={(title) => {
+          setLogbookEntry({
+            id: props.id,
+            title,
+          });
+        }}
+        variant="title"
+      />
+      <TextArea
+        value={entry.entity.description}
+        onChange={(description) => {
+          setLogbookEntry({
+            id: props.id,
+            description,
+          });
+        }}
+        placeholder="Description"
+      />
       {entry.references.updates.ids.map((id) => (
         <LogbookUpdate key={id} id={id} />
       ))}

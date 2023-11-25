@@ -12,5 +12,5 @@ export default function LogbookEntryPage({
     slug: string;
   };
 }) {
-  return <LogbookEntryBlock entryID={params.slug} />;
+  return <LogbookEntryBlock id={params.slug} />;
 }

@@ -18,7 +18,7 @@
 'use client';
 
 import createID from '@/lib/create-id';
-import { useEffect, useState } from 'react';
+import { useEffect, useReducer, useState } from 'react';
 
 type ID = string;
 type ModelType = 'LogbookEntry' | 'LogbookUpdate' | 'LogbookIngredient';
@@ -202,6 +202,15 @@ const cache: Cache = {
 const eventBus = new EventTarget();
 
 /**
+ * A React hook to force a component to update and re-render.
+ */
+function useForceUpdate() {
+  const [, forceUpdate] = useReducer((n) => n + 1, 0);
+
+  return forceUpdate;
+}
+
+/**
  * Updates a logbook entry and re-renders any subscribed components.
  */
 export function setLogbookEntry(options: {
@@ -280,8 +289,6 @@ export function setLogbookUpdate(options: {
       ...options,
     },
   };
-
-  eventBus.dispatchEvent(new Event(`LogbookUpdate.${options.id}.UPDATE`));
 }
 
 /**
@@ -339,15 +346,13 @@ export function setLogbookIngredient(options: { id: ID; text?: string }): void {
  * React hook to get a logbook entryin the cache.
  */
 export function useLogbookEntry(id: ID): LogbookEntryModel {
-  const [counter, setCounter] = useState(0);
+  const forceUpdate = useForceUpdate();
 
   useEffect(() => {
-    const handleUpdate = () => setCounter(counter + 1);
-
-    eventBus.addEventListener(`LogbookEntry.${id}.UPDATE`, handleUpdate);
+    eventBus.addEventListener(`LogbookEntry.${id}.UPDATE`, forceUpdate);
 
     return () => {
-      eventBus.removeEventListener(`LogbookEntry.${id}.UPDATE`, handleUpdate);
+      eventBus.removeEventListener(`LogbookEntry.${id}.UPDATE`, forceUpdate);
     };
   }, []);
 
