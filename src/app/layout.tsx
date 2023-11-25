@@ -2,6 +2,7 @@ import './globals.css';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import NavigationMenuBlock from '@/ui/core/navigation/NavigationMenuBlock';
+import { ApplicationProvider } from '@/ui/core/ApplicationContext';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -19,8 +20,10 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <div className="container">
-          <NavigationMenuBlock />
-          {children}
+          <ApplicationProvider>
+            <NavigationMenuBlock />
+            <main>{children}</main>
+          </ApplicationProvider>
         </div>
       </body>
     </html>

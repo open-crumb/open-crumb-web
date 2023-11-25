@@ -6,6 +6,7 @@ export default function NavigationMenuBlock() {
   return (
     <nav className="flex gap-4">
       <Link href="/">Home</Link>
+      <Link href="/logbook">Logbook</Link>
       <Link href="/calculator">Calculator</Link>
     </nav>
   );

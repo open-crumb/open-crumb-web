@@ -140,6 +140,10 @@ test('adding a levain', async ({ page }) => {
   await page.getByRole('menuitem', { name: 'Levain' }).click();
   await expect(page.getByLabel('Levain', { exact: true })).toHaveValue('20');
   await expect(page.getByLabel('Levain Weight')).toHaveValue('100');
+  await expect(page.getByLabel('Ingredient Name').nth(0)).toHaveValue('Flour');
+  await expect(page.getByLabel('Ingredient Percent').nth(0)).toHaveValue('10');
+  await expect(page.getByLabel('Ingredient Name').nth(1)).toHaveValue('Water');
+  await expect(page.getByLabel('Ingredient Percent').nth(1)).toHaveValue('10');
 
   await page.getByLabel('Levain', { exact: true }).fill('10');
   await expect(page.getByLabel('Levain Weight')).toHaveValue('50');
@@ -148,8 +152,8 @@ test('adding a levain', async ({ page }) => {
   await page.getByText('Add Ingredient').nth(1).click();
   await page.getByRole('menuitem', { name: 'Other' }).click();
 
-  await page.getByLabel('Ingredient Name').fill('Sugar');
-  await page.getByLabel('Ingredient Percent').fill('4');
-  await expect(page.getByLabel('Ingredient Weight')).toHaveValue('20');
+  await page.getByLabel('Ingredient Name').nth(2).fill('Sugar');
+  await page.getByLabel('Ingredient Percent').nth(2).fill('4');
+  await expect(page.getByLabel('Ingredient Weight').nth(2)).toHaveValue('20');
   await expect(page.getByLabel('Dough Weight')).toHaveValue('930');
 });

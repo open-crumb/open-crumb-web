@@ -4,27 +4,20 @@
  */
 'use client';
 
+import { useContext } from 'react';
 import Heading from '@/ui/design/Heading';
-import CalculatorContext, {
-  CalculatorProvider,
-} from '@/ui/core/calculator/CalculatorContext';
+import CalculatorContext from '@/ui/core/calculator/CalculatorContext';
 import CalculatorEditor from '@/ui/core/calculator/CalculatorEditor';
 import CalculatorDisplay from '@/ui/core/calculator/CalculatorDisplay';
 
 export default function CalculatorBlock() {
+  const { state } = useContext(CalculatorContext);
+
   return (
-    <CalculatorProvider>
+    <>
       <Heading level="2">Calculator</Heading>
-      <CalculatorContext.Consumer>
-        {({ state }) => {
-          switch (state.step) {
-            case 'EDIT':
-              return <CalculatorEditor />;
-            case 'DISPLAY':
-              return <CalculatorDisplay />;
-          }
-        }}
-      </CalculatorContext.Consumer>
-    </CalculatorProvider>
+      {state.step === 'EDIT' && <CalculatorEditor />}
+      {state.step === 'DISPLAY' && <CalculatorDisplay />}
+    </>
   );
 }

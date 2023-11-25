@@ -1,3 +1,5 @@
+'use client';
+
 import { createContext, Dispatch, useReducer } from 'react';
 import removeRecordItem, { removeRecordItems } from '@/lib/remove-record-item';
 import {
@@ -519,7 +521,7 @@ function reducer(state: State, action: Action): State {
        * to save time if the user is expressing only a single liquid ingredient.
        */
       const percent =
-        state.inputs.flourIngredientIDs.length === 0
+        state.inputs.liquidIngredientIDs.length === 0
           ? calculatePercentDifference({
               totalPercent: state.inputs.hydrationPercent,
               otherPercents: state.inputs.levain

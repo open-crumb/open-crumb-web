@@ -1,4 +1,5 @@
 import CalculatorBlock from '@/ui/core/calculator/CalculatorBlock';
+import { CalculatorProvider } from '@/ui/core/calculator/CalculatorContext';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -7,8 +8,8 @@ export const metadata: Metadata = {
 
 export default function CalculatorPage() {
   return (
-    <main>
+    <CalculatorProvider>
       <CalculatorBlock />
-    </main>
+    </CalculatorProvider>
   );
 }
