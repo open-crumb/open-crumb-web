@@ -1,8 +1,16 @@
-import { useLogbookUpdate } from '@/ui/core/logbook/LogbookContext';
+import {
+  createLogbookIngredient,
+  deleteLogbookUpdate,
+  setLogbookUpdate,
+  useLogbookUpdate,
+} from '@/ui/core/logbook/LogbookContext';
 import LogbookIngredient from '@/ui/core/logbook/entry/LogbookIngredient';
 import Heading from '@/ui/design/Heading';
 import { useContext } from 'react';
 import ApplicationContext from '@/ui/core/ApplicationContext';
+import TextField from '@/ui/design/TextField';
+import TextArea from '@/ui/design/TextArea';
+import Button from '@/ui/design/Button';
 
 type Props = {
   id: string;
@@ -18,10 +26,29 @@ export default function LogbookUpdate(props: Props) {
   });
 
   return (
-    <div className="mt-4">
+    <div>
       <div>{dateFormatter.format(update.entity.date)}</div>
-      <Heading level="3">{update.entity.title}</Heading>
-      {update.entity.description && <p>{update.entity.description}</p>}
+      <TextField.Input
+        value={update.entity.title}
+        onChange={(title) => {
+          setLogbookUpdate({
+            id: props.id,
+            title,
+          });
+        }}
+        variant="title"
+        placeholder="Title"
+      />
+      <TextArea
+        value={update.entity.description}
+        onChange={(description) => {
+          setLogbookUpdate({
+            id: props.id,
+            description,
+          });
+        }}
+        placeholder="Description"
+      />
       {update.references.ingredients.ids.length > 0 && (
         <ul>
           {update.references.ingredients.ids.map((id) => (
@@ -31,6 +58,22 @@ export default function LogbookUpdate(props: Props) {
           ))}
         </ul>
       )}
+      <div className="flex justify-end gap-4">
+        <Button
+          onClick={() => {
+            createLogbookIngredient({ updateID: update.id });
+          }}
+        >
+          Add Ingredient
+        </Button>
+        <Button
+          onClick={() => {
+            deleteLogbookUpdate({ id: update.id });
+          }}
+        >
+          Delete Update
+        </Button>
+      </div>
     </div>
   );
 }

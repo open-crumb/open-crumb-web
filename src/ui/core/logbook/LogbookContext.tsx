@@ -234,12 +234,7 @@ export function setLogbookEntry(options: {
  * Creates a logbook update and adds it to the specific entry. Any components
  * subscribed to the entry will be re-rendered.
  */
-export function createLogbookUpdate(options: {
-  title: string;
-  description: string;
-  date: Date;
-  entryID: ID;
-}): void {
+export function createLogbookUpdate(options: { entryID: ID }): void {
   const id = createID('LogbookUpdate');
 
   cache.LogbookUpdate[id] = {
@@ -249,9 +244,9 @@ export function createLogbookUpdate(options: {
     isLocal: true,
     entity: {
       id,
-      title: options.title,
-      description: options.description,
-      date: options.date,
+      title: '',
+      description: '',
+      date: new Date(),
     },
     references: {
       entry: {
@@ -267,7 +262,7 @@ export function createLogbookUpdate(options: {
     },
   };
 
-  cache.LogbookEntry[options.entryID].references.updates.ids.push(id);
+  cache.LogbookEntry[options.entryID].references.updates.ids.unshift(id);
 
   eventBus.dispatchEvent(new Event(`LogbookEntry.${options.entryID}.UPDATE`));
 }
@@ -289,16 +284,32 @@ export function setLogbookUpdate(options: {
       ...options,
     },
   };
+
+  eventBus.dispatchEvent(new Event(`LogbookUpdate.${options.id}.UPDATE`));
+}
+
+export function deleteLogbookUpdate(options: { id: ID }): void {
+  const update = cache.LogbookUpdate[options.id];
+  const entry = cache.LogbookEntry[update.references.entry.id];
+
+  delete cache.LogbookUpdate[options.id];
+
+  entry.references.updates.ids = entry.references.updates.ids.filter(
+    (id) => id !== options.id,
+  );
+
+  update.references.ingredients.ids.forEach((id) => {
+    delete cache.LogbookIngredient[id];
+  });
+
+  eventBus.dispatchEvent(new Event(`LogbookEntry.${entry.id}.UPDATE`));
 }
 
 /**
  * Creates a logbook ingredient and adds it to the specified logbook update. Any
  * component subscribed to the logbook update will be re-rendered.
  */
-export function createLogbookIngredient(options: {
-  text: string;
-  updateID: ID;
-}): void {
+export function createLogbookIngredient(options: { updateID: ID }): void {
   const id = createID('LogbookIngredient');
 
   cache.LogbookIngredient[id] = {
@@ -308,7 +319,7 @@ export function createLogbookIngredient(options: {
     isLocal: true,
     entity: {
       id,
-      text: options.text,
+      text: '',
     },
     references: {
       update: {
@@ -319,9 +330,7 @@ export function createLogbookIngredient(options: {
     },
   };
 
-  cache.LogbookUpdate[options.updateID].references.ingredients.ids.push(
-    options.updateID,
-  );
+  cache.LogbookUpdate[options.updateID].references.ingredients.ids.push(id);
 
   eventBus.dispatchEvent(new Event(`LogbookUpdate.${options.updateID}.UPDATE`));
 }
@@ -340,6 +349,22 @@ export function setLogbookIngredient(options: { id: ID; text?: string }): void {
   };
 
   eventBus.dispatchEvent(new Event(`LogbookIngredient.${options.id}.UPDATE`));
+}
+
+/**
+ * Deletes a logbook ingredient and re-renders the affected update.
+ */
+export function deleteLogbookIngredient(options: { id: ID }): void {
+  const ingredient = cache.LogbookIngredient[options.id];
+  const update = cache.LogbookUpdate[ingredient.references.update.id];
+
+  delete cache.LogbookIngredient[options.id];
+
+  update.references.ingredients.ids = update.references.ingredients.ids.filter(
+    (id) => id !== options.id,
+  );
+
+  eventBus.dispatchEvent(new Event(`LogbookUpdate.${update.id}.UPDATE`));
 }
 
 /**
@@ -363,15 +388,13 @@ export function useLogbookEntry(id: ID): LogbookEntryModel {
  * React hook to get a logbook update from the cache.
  */
 export function useLogbookUpdate(id: ID): LogbookUpdateModel {
-  const [counter, setCounter] = useState(0);
+  const forceUpdate = useForceUpdate();
 
   useEffect(() => {
-    const handleUpdate = () => setCounter(counter + 1);
-
-    eventBus.addEventListener(`LogbookUpdate.${id}.UPDATE`, handleUpdate);
+    eventBus.addEventListener(`LogbookUpdate.${id}.UPDATE`, forceUpdate);
 
     return () => {
-      eventBus.removeEventListener(`LogbookUpdate.${id}.UPDATE`, handleUpdate);
+      eventBus.removeEventListener(`LogbookUpdate.${id}.UPDATE`, forceUpdate);
     };
   }, []);
 
@@ -382,17 +405,15 @@ export function useLogbookUpdate(id: ID): LogbookUpdateModel {
  * React hook to get a logbook ingredient from the cache.
  */
 export function useLogbookIngredient(id: ID): LogbookIngredientModel {
-  const [counter, setCounter] = useState(0);
+  const forceUpdate = useForceUpdate();
 
   useEffect(() => {
-    const handleUpdate = () => setCounter(counter + 1);
-
-    eventBus.addEventListener(`LogbookIngredient.${id}.UPDATE`, handleUpdate);
+    eventBus.addEventListener(`LogbookIngredient.${id}.UPDATE`, forceUpdate);
 
     return () => {
       eventBus.removeEventListener(
         `LogbookIngredient.${id}.UPDATE`,
-        handleUpdate,
+        forceUpdate,
       );
     };
   }, []);

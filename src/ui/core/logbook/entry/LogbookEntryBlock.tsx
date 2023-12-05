@@ -7,12 +7,14 @@
 'use client';
 
 import {
+  createLogbookUpdate,
   setLogbookEntry,
   useLogbookEntry,
 } from '@/ui/core/logbook/LogbookContext';
 import LogbookUpdate from '@/ui/core/logbook/entry/LogbookUpdate';
 import TextField from '@/ui/design/TextField';
 import TextArea from '@/ui/design/TextArea';
+import Button from '@/ui/design/Button';
 
 type Props = {
   id: string;
@@ -43,8 +45,17 @@ export default function LogbookEntryBlock(props: Props) {
         }}
         placeholder="Description"
       />
+      <Button
+        onClick={() => {
+          createLogbookUpdate({ entryID: entry.id });
+        }}
+      >
+        New Update
+      </Button>
       {entry.references.updates.ids.map((id) => (
-        <LogbookUpdate key={id} id={id} />
+        <div key={id} className="mt-8">
+          <LogbookUpdate id={id} />
+        </div>
       ))}
     </>
   );
