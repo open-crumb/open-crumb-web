@@ -4,6 +4,7 @@ type Props = {
   onClick?: () => void;
   children?: React.ReactNode;
   'aria-label'?: string;
+  type?: 'submit';
 };
 
 const Button = React.forwardRef<React.ElementRef<'button'>, Props>(

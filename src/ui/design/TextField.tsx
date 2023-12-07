@@ -18,7 +18,7 @@ export function Slot({ children }: SlotProps) {
 }
 
 type InputProps = {
-  type?: 'text' | 'number';
+  type?: 'text' | 'number' | 'datetime-local' | 'password' | 'email';
   value: string;
   onChange: (value: string, event: ChangeEvent<HTMLInputElement>) => void;
   align?: 'left' | 'right';

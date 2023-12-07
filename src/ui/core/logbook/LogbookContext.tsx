@@ -18,7 +18,7 @@
 'use client';
 
 import createID from '@/lib/create-id';
-import { useEffect, useReducer, useState } from 'react';
+import { useEffect, useReducer } from 'react';
 
 type ID = string;
 type ModelType = 'LogbookEntry' | 'LogbookUpdate' | 'LogbookIngredient';

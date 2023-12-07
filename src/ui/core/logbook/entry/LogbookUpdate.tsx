@@ -5,12 +5,12 @@ import {
   useLogbookUpdate,
 } from '@/ui/core/logbook/LogbookContext';
 import LogbookIngredient from '@/ui/core/logbook/entry/LogbookIngredient';
-import Heading from '@/ui/design/Heading';
 import { useContext } from 'react';
 import ApplicationContext from '@/ui/core/ApplicationContext';
 import TextField from '@/ui/design/TextField';
 import TextArea from '@/ui/design/TextArea';
 import Button from '@/ui/design/Button';
+import Badge from '@/ui/design/Badge';
 
 type Props = {
   id: string;
@@ -27,7 +27,7 @@ export default function LogbookUpdate(props: Props) {
 
   return (
     <div>
-      <div>{dateFormatter.format(update.entity.date)}</div>
+      <Badge>{dateFormatter.format(update.entity.date)}</Badge>
       <TextField.Input
         value={update.entity.title}
         onChange={(title) => {
