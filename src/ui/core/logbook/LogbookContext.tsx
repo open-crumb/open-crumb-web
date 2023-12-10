@@ -18,7 +18,14 @@
 'use client';
 
 import createID from '@/lib/create-id';
-import { useEffect, useReducer } from 'react';
+import {
+  createContext,
+  RefObject,
+  useContext,
+  useEffect,
+  useReducer,
+  useRef,
+} from 'react';
 
 type ID = string;
 type ModelType = 'LogbookEntry' | 'LogbookUpdate' | 'LogbookIngredient';
@@ -91,7 +98,7 @@ type LogbookIngredientEntity = {
   text: string;
 };
 
-type Cache = {
+export type Cache = {
   LogbookEntry: Record<ID, LogbookEntryModel>;
   LogbookUpdate: Record<ID, LogbookUpdateModel>;
   LogbookIngredient: Record<ID, LogbookIngredientModel>;
@@ -199,7 +206,201 @@ const cache: Cache = {
   },
 };
 
-const eventBus = new EventTarget();
+type LogbookContextValue = {
+  cacheRef: RefObject<Cache>;
+  eventBusRef: RefObject<EventTarget>;
+};
+
+const LogbookContext = createContext<LogbookContextValue>({
+  cacheRef: {
+    current: {
+      LogbookEntry: {},
+      LogbookUpdate: {},
+      LogbookIngredient: {},
+    },
+  },
+  eventBusRef: {
+    current: new EventTarget(),
+  },
+});
+
+type LogbookProviderProps = {
+  initialCache: Cache;
+  children: React.ReactNode;
+};
+
+export function LogbookProvider({
+  initialCache,
+  children,
+}: LogbookProviderProps) {
+  const cacheRef = useRef(initialCache);
+  const eventBusRef = useRef(new EventTarget());
+
+  return (
+    <LogbookContext.Provider value={{ cacheRef, eventBusRef }}>
+      {children}
+    </LogbookContext.Provider>
+  );
+}
+
+function useCache(): Cache {
+  const { cacheRef } = useContext(LogbookContext);
+
+  return cacheRef.current!;
+}
+
+function useEventBus(): EventTarget {
+  const { eventBusRef } = useContext(LogbookContext);
+
+  return eventBusRef.current!;
+}
+
+export function useLogbookActions(): {
+  setEntry(options: { id: ID; title?: string; description?: string }): void;
+  createUpdate(options: { entryID: ID }): void;
+  setUpdate(options: {
+    id: ID;
+    title?: string;
+    description?: string;
+    date?: Date;
+  }): void;
+  deleteUpdate(options: { id: ID }): void;
+  createIngredient(options: { updateID: ID }): void;
+  setIngredient(options: { id: ID; text?: string }): void;
+  deleteIngredient(options: { id: ID }): void;
+} {
+  const cache = useCache();
+  const eventBus = useEventBus();
+
+  return {
+    setEntry(options) {
+      cache.LogbookEntry[options.id] = {
+        ...cache.LogbookEntry[options.id],
+        modifiedAt: new Date(),
+        entity: {
+          ...cache.LogbookEntry[options.id].entity,
+          ...options,
+        },
+      };
+
+      eventBus.dispatchEvent(new Event(`LogbookEntry.${options.id}.UPDATE`));
+    },
+    createUpdate(options) {
+      const id = createID('LogbookUpdate');
+
+      cache.LogbookUpdate[id] = {
+        id,
+        createdAt: new Date(),
+        modifiedAt: new Date(),
+        isLocal: true,
+        entity: {
+          id,
+          title: '',
+          description: '',
+          date: new Date(),
+        },
+        references: {
+          entry: {
+            type: 'ONE',
+            to: 'LogbookEntry',
+            id: 'le.1',
+          },
+          ingredients: {
+            type: 'MANY',
+            to: 'LogbookIngredient',
+            ids: [],
+          },
+        },
+      };
+
+      cache.LogbookEntry[options.entryID].references.updates.ids.unshift(id);
+
+      eventBus.dispatchEvent(
+        new Event(`LogbookEntry.${options.entryID}.UPDATE`),
+      );
+    },
+    setUpdate(options) {
+      cache.LogbookUpdate[options.id] = {
+        ...cache.LogbookUpdate[options.id],
+        modifiedAt: new Date(),
+        entity: {
+          ...cache.LogbookUpdate[options.id].entity,
+          ...options,
+        },
+      };
+
+      eventBus.dispatchEvent(new Event(`LogbookUpdate.${options.id}.UPDATE`));
+    },
+    deleteUpdate(options) {
+      const update = cache.LogbookUpdate[options.id];
+      const entry = cache.LogbookEntry[update.references.entry.id];
+
+      delete cache.LogbookUpdate[options.id];
+
+      entry.references.updates.ids = entry.references.updates.ids.filter(
+        (id) => id !== options.id,
+      );
+
+      update.references.ingredients.ids.forEach((id) => {
+        delete cache.LogbookIngredient[id];
+      });
+
+      eventBus.dispatchEvent(new Event(`LogbookEntry.${entry.id}.UPDATE`));
+    },
+    createIngredient(options) {
+      const id = createID('LogbookIngredient');
+
+      cache.LogbookIngredient[id] = {
+        id,
+        createdAt: new Date(),
+        modifiedAt: new Date(),
+        isLocal: true,
+        entity: {
+          id,
+          text: '',
+        },
+        references: {
+          update: {
+            type: 'ONE',
+            to: 'LogbookUpdate',
+            id: options.updateID,
+          },
+        },
+      };
+
+      cache.LogbookUpdate[options.updateID].references.ingredients.ids.push(id);
+
+      eventBus.dispatchEvent(
+        new Event(`LogbookUpdate.${options.updateID}.UPDATE`),
+      );
+    },
+    setIngredient(options) {
+      cache.LogbookIngredient[options.id] = {
+        ...cache.LogbookIngredient[options.id],
+        modifiedAt: new Date(),
+        entity: {
+          ...cache.LogbookIngredient[options.id].entity,
+          ...options,
+        },
+      };
+
+      eventBus.dispatchEvent(
+        new Event(`LogbookIngredient.${options.id}.UPDATE`),
+      );
+    },
+    deleteIngredient(options) {
+      const ingredient = cache.LogbookIngredient[options.id];
+      const update = cache.LogbookUpdate[ingredient.references.update.id];
+
+      delete cache.LogbookIngredient[options.id];
+
+      update.references.ingredients.ids =
+        update.references.ingredients.ids.filter((id) => id !== options.id);
+
+      eventBus.dispatchEvent(new Event(`LogbookUpdate.${update.id}.UPDATE`));
+    },
+  };
+}
 
 /**
  * A React hook to force a component to update and re-render.
@@ -211,166 +412,11 @@ function useForceUpdate() {
 }
 
 /**
- * Updates a logbook entry and re-renders any subscribed components.
- */
-export function setLogbookEntry(options: {
-  id: ID;
-  title?: string;
-  description?: string;
-}): void {
-  cache.LogbookEntry[options.id] = {
-    ...cache.LogbookEntry[options.id],
-    modifiedAt: new Date(),
-    entity: {
-      ...cache.LogbookEntry[options.id].entity,
-      ...options,
-    },
-  };
-
-  eventBus.dispatchEvent(new Event(`LogbookEntry.${options.id}.UPDATE`));
-}
-
-/**
- * Creates a logbook update and adds it to the specific entry. Any components
- * subscribed to the entry will be re-rendered.
- */
-export function createLogbookUpdate(options: { entryID: ID }): void {
-  const id = createID('LogbookUpdate');
-
-  cache.LogbookUpdate[id] = {
-    id,
-    createdAt: new Date(),
-    modifiedAt: new Date(),
-    isLocal: true,
-    entity: {
-      id,
-      title: '',
-      description: '',
-      date: new Date(),
-    },
-    references: {
-      entry: {
-        type: 'ONE',
-        to: 'LogbookEntry',
-        id: 'le.1',
-      },
-      ingredients: {
-        type: 'MANY',
-        to: 'LogbookIngredient',
-        ids: [],
-      },
-    },
-  };
-
-  cache.LogbookEntry[options.entryID].references.updates.ids.unshift(id);
-
-  eventBus.dispatchEvent(new Event(`LogbookEntry.${options.entryID}.UPDATE`));
-}
-
-/**
- * Updates a logbook update and re-renders any subscribed components.
- */
-export function setLogbookUpdate(options: {
-  id: ID;
-  title?: string;
-  description?: string;
-  date?: Date;
-}): void {
-  cache.LogbookUpdate[options.id] = {
-    ...cache.LogbookUpdate[options.id],
-    modifiedAt: new Date(),
-    entity: {
-      ...cache.LogbookUpdate[options.id].entity,
-      ...options,
-    },
-  };
-
-  eventBus.dispatchEvent(new Event(`LogbookUpdate.${options.id}.UPDATE`));
-}
-
-export function deleteLogbookUpdate(options: { id: ID }): void {
-  const update = cache.LogbookUpdate[options.id];
-  const entry = cache.LogbookEntry[update.references.entry.id];
-
-  delete cache.LogbookUpdate[options.id];
-
-  entry.references.updates.ids = entry.references.updates.ids.filter(
-    (id) => id !== options.id,
-  );
-
-  update.references.ingredients.ids.forEach((id) => {
-    delete cache.LogbookIngredient[id];
-  });
-
-  eventBus.dispatchEvent(new Event(`LogbookEntry.${entry.id}.UPDATE`));
-}
-
-/**
- * Creates a logbook ingredient and adds it to the specified logbook update. Any
- * component subscribed to the logbook update will be re-rendered.
- */
-export function createLogbookIngredient(options: { updateID: ID }): void {
-  const id = createID('LogbookIngredient');
-
-  cache.LogbookIngredient[id] = {
-    id,
-    createdAt: new Date(),
-    modifiedAt: new Date(),
-    isLocal: true,
-    entity: {
-      id,
-      text: '',
-    },
-    references: {
-      update: {
-        type: 'ONE',
-        to: 'LogbookUpdate',
-        id: options.updateID,
-      },
-    },
-  };
-
-  cache.LogbookUpdate[options.updateID].references.ingredients.ids.push(id);
-
-  eventBus.dispatchEvent(new Event(`LogbookUpdate.${options.updateID}.UPDATE`));
-}
-
-/**
- * Updates a logbook ingredient and re-renders any subscribed components.
- */
-export function setLogbookIngredient(options: { id: ID; text?: string }): void {
-  cache.LogbookIngredient[options.id] = {
-    ...cache.LogbookIngredient[options.id],
-    modifiedAt: new Date(),
-    entity: {
-      ...cache.LogbookIngredient[options.id].entity,
-      ...options,
-    },
-  };
-
-  eventBus.dispatchEvent(new Event(`LogbookIngredient.${options.id}.UPDATE`));
-}
-
-/**
- * Deletes a logbook ingredient and re-renders the affected update.
- */
-export function deleteLogbookIngredient(options: { id: ID }): void {
-  const ingredient = cache.LogbookIngredient[options.id];
-  const update = cache.LogbookUpdate[ingredient.references.update.id];
-
-  delete cache.LogbookIngredient[options.id];
-
-  update.references.ingredients.ids = update.references.ingredients.ids.filter(
-    (id) => id !== options.id,
-  );
-
-  eventBus.dispatchEvent(new Event(`LogbookUpdate.${update.id}.UPDATE`));
-}
-
-/**
  * React hook to get a logbook entryin the cache.
  */
 export function useLogbookEntry(id: ID): LogbookEntryModel {
+  const cache = useCache();
+  const eventBus = useEventBus();
   const forceUpdate = useForceUpdate();
 
   useEffect(() => {
@@ -379,7 +425,7 @@ export function useLogbookEntry(id: ID): LogbookEntryModel {
     return () => {
       eventBus.removeEventListener(`LogbookEntry.${id}.UPDATE`, forceUpdate);
     };
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return cache.LogbookEntry[id];
 }
@@ -388,6 +434,8 @@ export function useLogbookEntry(id: ID): LogbookEntryModel {
  * React hook to get a logbook update from the cache.
  */
 export function useLogbookUpdate(id: ID): LogbookUpdateModel {
+  const cache = useCache();
+  const eventBus = useEventBus();
   const forceUpdate = useForceUpdate();
 
   useEffect(() => {
@@ -396,7 +444,7 @@ export function useLogbookUpdate(id: ID): LogbookUpdateModel {
     return () => {
       eventBus.removeEventListener(`LogbookUpdate.${id}.UPDATE`, forceUpdate);
     };
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return cache.LogbookUpdate[id];
 }
@@ -405,6 +453,8 @@ export function useLogbookUpdate(id: ID): LogbookUpdateModel {
  * React hook to get a logbook ingredient from the cache.
  */
 export function useLogbookIngredient(id: ID): LogbookIngredientModel {
+  const cache = useCache();
+  const eventBus = useEventBus();
   const forceUpdate = useForceUpdate();
 
   useEffect(() => {
@@ -416,7 +466,7 @@ export function useLogbookIngredient(id: ID): LogbookIngredientModel {
         forceUpdate,
       );
     };
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return cache.LogbookIngredient[id];
 }

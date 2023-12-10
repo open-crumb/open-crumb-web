@@ -8,14 +8,24 @@
 import Heading from '@/ui/design/Heading';
 import Link from 'next/link';
 
-export default function LogbookBlock() {
+type Props = {
+  entries: Array<{
+    id: string;
+    slug: string;
+    title: string;
+  }>;
+};
+
+export default function LogbookBlock(props: Props) {
   return (
     <div>
       <Heading level="2">Logbook</Heading>
       <ul>
-        <li>
-          <Link href="/logbook/le.1">Classic Sourdough</Link>
-        </li>
+        {props.entries.map((entry) => (
+          <li key={entry.id}>
+            <Link href={`/logbook/${entry.slug}`}>{entry.title}</Link>
+          </li>
+        ))}
       </ul>
     </div>
   );

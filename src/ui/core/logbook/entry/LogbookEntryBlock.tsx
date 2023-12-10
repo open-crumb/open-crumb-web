@@ -7,8 +7,7 @@
 'use client';
 
 import {
-  createLogbookUpdate,
-  setLogbookEntry,
+  useLogbookActions,
   useLogbookEntry,
 } from '@/ui/core/logbook/LogbookContext';
 import LogbookUpdate from '@/ui/core/logbook/entry/LogbookUpdate';
@@ -22,13 +21,14 @@ type Props = {
 
 export default function LogbookEntryBlock(props: Props) {
   const entry = useLogbookEntry(props.id);
+  const { createUpdate, setEntry } = useLogbookActions();
 
   return (
     <>
       <TextField.Input
         value={entry.entity.title}
         onChange={(title) => {
-          setLogbookEntry({
+          setEntry({
             id: props.id,
             title,
           });
@@ -38,7 +38,7 @@ export default function LogbookEntryBlock(props: Props) {
       <TextArea
         value={entry.entity.description}
         onChange={(description) => {
-          setLogbookEntry({
+          setEntry({
             id: props.id,
             description,
           });
@@ -47,7 +47,7 @@ export default function LogbookEntryBlock(props: Props) {
       />
       <Button
         onClick={() => {
-          createLogbookUpdate({ entryID: entry.id });
+          createUpdate({ entryID: entry.id });
         }}
       >
         New Update

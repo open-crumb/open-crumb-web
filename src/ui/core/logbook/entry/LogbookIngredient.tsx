@@ -1,6 +1,5 @@
 import {
-  deleteLogbookIngredient,
-  setLogbookIngredient,
+  useLogbookActions,
   useLogbookIngredient,
 } from '@/ui/core/logbook/LogbookContext';
 import Button from '@/ui/design/Button';
@@ -13,13 +12,14 @@ type Props = {
 
 export default function LogbookIngredient(props: Props) {
   const ingredient = useLogbookIngredient(props.id);
+  const { setIngredient, deleteIngredient } = useLogbookActions();
 
   return (
     <TextField.Root>
       <TextField.Input
         value={ingredient.entity.text}
         onChange={(text) => {
-          setLogbookIngredient({
+          setIngredient({
             id: props.id,
             text,
           });
@@ -29,7 +29,7 @@ export default function LogbookIngredient(props: Props) {
       <TextField.Slot>
         <Button
           onClick={() => {
-            deleteLogbookIngredient({ id: props.id });
+            deleteIngredient({ id: props.id });
           }}
         >
           <Cross1Icon aria-label="Delete Ingredient" />

@@ -8,5 +8,5 @@ let count = 0;
  * @returns The generated ID
  */
 export default function createID(label?: string): string {
-  return label ? `${label}.${count++}` : `${count++}`;
+  return label ? `local.${label}.${count++}` : `local.${count++}`;
 }

@@ -1,7 +1,5 @@
 import {
-  createLogbookIngredient,
-  deleteLogbookUpdate,
-  setLogbookUpdate,
+  useLogbookActions,
   useLogbookUpdate,
 } from '@/ui/core/logbook/LogbookContext';
 import LogbookIngredient from '@/ui/core/logbook/entry/LogbookIngredient';
@@ -19,6 +17,7 @@ type Props = {
 export default function LogbookUpdate(props: Props) {
   const { locale } = useContext(ApplicationContext);
   const update = useLogbookUpdate(props.id);
+  const { createIngredient, deleteUpdate, setUpdate } = useLogbookActions();
 
   const dateFormatter = new Intl.DateTimeFormat(locale, {
     hour: 'numeric',
@@ -31,7 +30,7 @@ export default function LogbookUpdate(props: Props) {
       <TextField.Input
         value={update.entity.title}
         onChange={(title) => {
-          setLogbookUpdate({
+          setUpdate({
             id: props.id,
             title,
           });
@@ -42,7 +41,7 @@ export default function LogbookUpdate(props: Props) {
       <TextArea
         value={update.entity.description}
         onChange={(description) => {
-          setLogbookUpdate({
+          setUpdate({
             id: props.id,
             description,
           });
@@ -61,14 +60,14 @@ export default function LogbookUpdate(props: Props) {
       <div className="flex justify-end gap-4">
         <Button
           onClick={() => {
-            createLogbookIngredient({ updateID: update.id });
+            createIngredient({ updateID: update.id });
           }}
         >
           Add Ingredient
         </Button>
         <Button
           onClick={() => {
-            deleteLogbookUpdate({ id: update.id });
+            deleteUpdate({ id: update.id });
           }}
         >
           Delete Update
