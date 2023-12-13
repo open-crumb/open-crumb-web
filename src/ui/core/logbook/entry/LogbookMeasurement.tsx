@@ -1,7 +1,7 @@
-import { INGREDIENT_UNITS } from '@/lib/units';
+import { MEASUREMENT_UNITS } from '@/lib/units';
 import {
   useLogbookActions,
-  useLogbookIngredient,
+  useLogbookMeasurement,
 } from '@/ui/core/logbook/LogbookContext';
 import Button from '@/ui/design/Button';
 import Select from '@/ui/design/Select';
@@ -12,9 +12,9 @@ type Props = {
   id: string;
 };
 
-export default function LogbookIngredient(props: Props) {
-  const ingredient = useLogbookIngredient(props.id);
-  const { setIngredient, deleteIngredient } = useLogbookActions();
+export default function LogbookMeasurement(props: Props) {
+  const ingredient = useLogbookMeasurement(props.id);
+  const { setMeasurement, deleteMeasurement } = useLogbookActions();
 
   return (
     <div className="flex items-center gap-2">
@@ -22,25 +22,25 @@ export default function LogbookIngredient(props: Props) {
         <TextField.Input
           value={ingredient.entity.name}
           onChange={(name) => {
-            setIngredient({
+            setMeasurement({
               id: props.id,
               name,
             });
           }}
-          placeholder="Flour"
+          placeholder="Dough Temperature"
         />
       </div>
       <div className="flex-[1]">
         <TextField.Input
           type="number"
-          value={ingredient.entity.quantity}
-          onChange={(quantity) => {
-            setIngredient({
+          value={ingredient.entity.value}
+          onChange={(value) => {
+            setMeasurement({
               id: props.id,
-              quantity,
+              value,
             });
           }}
-          placeholder="50"
+          placeholder="80"
           align="right"
         />
       </div>
@@ -48,7 +48,7 @@ export default function LogbookIngredient(props: Props) {
         <Select.Root
           value={ingredient.entity.unit}
           onValueChange={(unit) => {
-            setIngredient({
+            setMeasurement({
               id: props.id,
               unit,
             });
@@ -56,18 +56,27 @@ export default function LogbookIngredient(props: Props) {
         >
           <Select.Trigger />
           <Select.Content>
-            {INGREDIENT_UNITS.map(({ value, text }) => (
+            {MEASUREMENT_UNITS.map(({ value, text }) => (
               <Select.Item key={value} value={value}>
                 {text}
               </Select.Item>
             ))}
           </Select.Content>
         </Select.Root>
+        {/* <TextField.Input
+          value={ingredient.entity.unit}
+          onChange={(unit) => {
+            setMeasurement({
+              id: props.id,
+              unit,
+            });
+          }}
+        /> */}
       </div>
       <div className="flex-shrink">
         <Button
           onClick={() => {
-            deleteIngredient({ id: props.id });
+            deleteMeasurement({ id: props.id });
           }}
         >
           <Cross1Icon aria-label="Delete Ingredient" />

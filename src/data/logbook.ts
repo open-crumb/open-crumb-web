@@ -16,13 +16,26 @@ type LogbookUpdate = {
   description: string;
   entryID: string;
   ingredientIDs: string[];
+  measurementIDs: string[];
 };
 
 type LogbookIngredient = {
   id: string;
   createdAt: Date;
   modifiedAt: Date;
-  text: string;
+  name: string;
+  quantity: number | null;
+  unit: string | null;
+  updateID: string;
+};
+
+type LogbookMeasurement = {
+  id: string;
+  createdAt: Date;
+  modifiedAt: Date;
+  name: string;
+  value: number;
+  unit: string;
   updateID: string;
 };
 
@@ -30,6 +43,7 @@ const data: {
   LogbookEntry: Record<string, LogbookEntry>;
   LogbookUpdate: Record<string, LogbookUpdate>;
   LogbookIngredient: Record<string, LogbookIngredient>;
+  LogbookMeasurement: Record<string, LogbookMeasurement>;
 } = {
   LogbookEntry: {
     'LogbookEntry.1': {
@@ -55,6 +69,7 @@ const data: {
         'LogbookIngredient.2',
         'LogbookIngredient.3',
       ],
+      measurementIDs: ['LogbookMeasurement.1'],
     },
   },
   LogbookIngredient: {
@@ -62,21 +77,38 @@ const data: {
       id: 'LogbookIngredient.1',
       createdAt: new Date(),
       modifiedAt: new Date(),
-      text: '20g Sourdough Starter',
+      name: 'Sourdough Starter',
+      quantity: 20,
+      unit: 'gram',
       updateID: 'LogbookUpdate.1',
     },
     'LogbookIngredient.2': {
       id: 'LogbookIngredient.2',
       createdAt: new Date(),
       modifiedAt: new Date(),
-      text: '40g Flour',
+      name: 'Flour',
+      quantity: 40,
+      unit: 'gram',
       updateID: 'LogbookUpdate.1',
     },
     'LogbookIngredient.3': {
       id: 'LogbookIngredient.3',
       createdAt: new Date(),
       modifiedAt: new Date(),
-      text: '40g Water',
+      name: 'Water',
+      quantity: 40,
+      unit: 'gram',
+      updateID: 'LogbookUpdate.1',
+    },
+  },
+  LogbookMeasurement: {
+    'LogbookMeasurement.1': {
+      id: 'LogbookMeasurement.1',
+      createdAt: new Date(),
+      modifiedAt: new Date(),
+      name: 'Dough Temperature',
+      value: 80,
+      unit: 'fahrenheit',
       updateID: 'LogbookUpdate.1',
     },
   },

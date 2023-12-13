@@ -4,10 +4,18 @@ import { createContext } from 'react';
 
 type ApplicationContextValue = {
   locale: string;
+  preferences: {
+    units: 'IMPERIAL' | 'METRIC';
+    temperature: 'FAHRENHEIT' | 'CELSIUS';
+  };
 };
 
 const ApplicationContext = createContext<ApplicationContextValue>({
   locale: 'en-US',
+  preferences: {
+    units: 'METRIC',
+    temperature: 'FAHRENHEIT',
+  },
 });
 
 export default ApplicationContext;
@@ -17,10 +25,16 @@ type Props = {
 };
 
 export function ApplicationProvider({ children }: Props) {
-  const locale = 'en-US';
-
   return (
-    <ApplicationContext.Provider value={{ locale }}>
+    <ApplicationContext.Provider
+      value={{
+        locale: 'en-US',
+        preferences: {
+          units: 'METRIC',
+          temperature: 'FAHRENHEIT',
+        },
+      }}
+    >
       {children}
     </ApplicationContext.Provider>
   );

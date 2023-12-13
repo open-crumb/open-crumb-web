@@ -28,7 +28,11 @@ import {
 } from 'react';
 
 type ID = string;
-type ModelType = 'LogbookEntry' | 'LogbookUpdate' | 'LogbookIngredient';
+type ModelType =
+  | 'LogbookEntry'
+  | 'LogbookUpdate'
+  | 'LogbookIngredient'
+  | 'LogbookMeasurement';
 
 type BaseReferenceOne = {
   type: 'ONE';
@@ -71,10 +75,17 @@ interface LogbookUpdateModel extends BaseModel<LogbookUpdateEntity> {
   references: {
     entry: ReferenceOne<'LogbookEntry'>;
     ingredients: ReferenceMany<'LogbookIngredient'>;
+    measurements: ReferenceMany<'LogbookMeasurement'>;
   };
 }
 
 interface LogbookIngredientModel extends BaseModel<LogbookIngredientEntity> {
+  references: {
+    update: ReferenceOne<'LogbookUpdate'>;
+  };
+}
+
+interface LogbookMeasurementModel extends BaseModel<LogbookMeasurementEntity> {
   references: {
     update: ReferenceOne<'LogbookUpdate'>;
   };
@@ -95,115 +106,23 @@ type LogbookUpdateEntity = {
 
 type LogbookIngredientEntity = {
   id: ID;
-  text: string;
+  name: string;
+  quantity: string;
+  unit: string;
+};
+
+type LogbookMeasurementEntity = {
+  id: ID;
+  name: string;
+  value: string;
+  unit: string;
 };
 
 export type Cache = {
   LogbookEntry: Record<ID, LogbookEntryModel>;
   LogbookUpdate: Record<ID, LogbookUpdateModel>;
   LogbookIngredient: Record<ID, LogbookIngredientModel>;
-};
-
-const cache: Cache = {
-  LogbookEntry: {
-    'le.1': {
-      id: 'le.1',
-      createdAt: new Date(),
-      modifiedAt: new Date(),
-      isLocal: true,
-      entity: {
-        id: 'le.1',
-        title: 'Classic Sourdough',
-        description: '',
-      },
-      references: {
-        updates: {
-          type: 'MANY',
-          to: 'LogbookUpdate',
-          ids: ['lu.1'],
-        },
-      },
-    },
-  },
-  LogbookUpdate: {
-    'lu.1': {
-      id: 'lu.1',
-      createdAt: new Date(),
-      modifiedAt: new Date(),
-      isLocal: true,
-      entity: {
-        id: 'lu.1',
-        date: new Date('2023-11-24T11:00:00.000Z'),
-        title: 'Prepare Levain',
-        description: '',
-      },
-      references: {
-        entry: {
-          type: 'ONE',
-          to: 'LogbookEntry',
-          id: 'le.1',
-        },
-        ingredients: {
-          type: 'MANY',
-          to: 'LogbookIngredient',
-          ids: ['li.1', 'li.2', 'li.3'],
-        },
-      },
-    },
-  },
-  LogbookIngredient: {
-    'li.1': {
-      id: 'li.1',
-      createdAt: new Date(),
-      modifiedAt: new Date(),
-      isLocal: true,
-      entity: {
-        id: 'li.1',
-        text: '20g Sourdough Starter',
-      },
-      references: {
-        update: {
-          type: 'ONE',
-          to: 'LogbookUpdate',
-          id: 'lu.1',
-        },
-      },
-    },
-    'li.2': {
-      id: 'li.2',
-      createdAt: new Date(),
-      modifiedAt: new Date(),
-      isLocal: true,
-      entity: {
-        id: 'li.2',
-        text: '40g Flour',
-      },
-      references: {
-        update: {
-          type: 'ONE',
-          to: 'LogbookUpdate',
-          id: 'lu.1',
-        },
-      },
-    },
-    'li.3': {
-      id: 'li.3',
-      createdAt: new Date(),
-      modifiedAt: new Date(),
-      isLocal: true,
-      entity: {
-        id: 'li.3',
-        text: '40g Water',
-      },
-      references: {
-        update: {
-          type: 'ONE',
-          to: 'LogbookUpdate',
-          id: 'lu.1',
-        },
-      },
-    },
-  },
+  LogbookMeasurement: Record<ID, LogbookMeasurementModel>;
 };
 
 type LogbookContextValue = {
@@ -217,6 +136,7 @@ const LogbookContext = createContext<LogbookContextValue>({
       LogbookEntry: {},
       LogbookUpdate: {},
       LogbookIngredient: {},
+      LogbookMeasurement: {},
     },
   },
   eventBusRef: {
@@ -266,8 +186,21 @@ export function useLogbookActions(): {
   }): void;
   deleteUpdate(options: { id: ID }): void;
   createIngredient(options: { updateID: ID }): void;
-  setIngredient(options: { id: ID; text?: string }): void;
+  setIngredient(options: {
+    id: ID;
+    name?: string;
+    quantity?: string;
+    unit?: string;
+  }): void;
   deleteIngredient(options: { id: ID }): void;
+  createMeasurement(options: { updateID: ID }): void;
+  setMeasurement(options: {
+    id: ID;
+    name?: string;
+    value?: string;
+    unit?: string;
+  }): void;
+  deleteMeasurement(options: { id: ID }): void;
 } {
   const cache = useCache();
   const eventBus = useEventBus();
@@ -308,6 +241,11 @@ export function useLogbookActions(): {
           ingredients: {
             type: 'MANY',
             to: 'LogbookIngredient',
+            ids: [],
+          },
+          measurements: {
+            type: 'MANY',
+            to: 'LogbookMeasurement',
             ids: [],
           },
         },
@@ -357,7 +295,9 @@ export function useLogbookActions(): {
         isLocal: true,
         entity: {
           id,
-          text: '',
+          name: '',
+          quantity: '',
+          unit: 'gram',
         },
         references: {
           update: {
@@ -396,6 +336,62 @@ export function useLogbookActions(): {
 
       update.references.ingredients.ids =
         update.references.ingredients.ids.filter((id) => id !== options.id);
+
+      eventBus.dispatchEvent(new Event(`LogbookUpdate.${update.id}.UPDATE`));
+    },
+    createMeasurement(options) {
+      const id = createID('LogbookMeasurement');
+
+      cache.LogbookMeasurement[id] = {
+        id,
+        createdAt: new Date(),
+        modifiedAt: new Date(),
+        isLocal: true,
+        entity: {
+          id,
+          name: '',
+          value: '',
+          unit: 'fahrenheit',
+        },
+        references: {
+          update: {
+            type: 'ONE',
+            to: 'LogbookUpdate',
+            id: options.updateID,
+          },
+        },
+      };
+
+      cache.LogbookUpdate[options.updateID].references.measurements.ids.push(
+        id,
+      );
+
+      eventBus.dispatchEvent(
+        new Event(`LogbookUpdate.${options.updateID}.UPDATE`),
+      );
+    },
+    setMeasurement(options) {
+      cache.LogbookMeasurement[options.id] = {
+        ...cache.LogbookMeasurement[options.id],
+        modifiedAt: new Date(),
+        entity: {
+          ...cache.LogbookMeasurement[options.id].entity,
+          ...options,
+        },
+      };
+
+      eventBus.dispatchEvent(
+        new Event(`LogbookMeasurement.${options.id}.UPDATE`),
+      );
+    },
+    deleteMeasurement(options) {
+      const measurement = cache.LogbookMeasurement[options.id];
+      const update = cache.LogbookUpdate[measurement.references.update.id];
+
+      delete cache.LogbookMeasurement[options.id];
+
+      update.references.measurements.ids =
+        update.references.measurements.ids.filter((id) => id !== options.id);
 
       eventBus.dispatchEvent(new Event(`LogbookUpdate.${update.id}.UPDATE`));
     },
@@ -469,4 +465,23 @@ export function useLogbookIngredient(id: ID): LogbookIngredientModel {
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return cache.LogbookIngredient[id];
+}
+
+export function useLogbookMeasurement(id: ID): LogbookMeasurementModel {
+  const cache = useCache();
+  const eventBus = useEventBus();
+  const forceUpdate = useForceUpdate();
+
+  useEffect(() => {
+    eventBus.addEventListener(`LogbookMeasurement.${id}.UPDATE`, forceUpdate);
+
+    return () => {
+      eventBus.removeEventListener(
+        `LogbookMeasurement.${id}.UPDATE`,
+        forceUpdate,
+      );
+    };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  return cache.LogbookMeasurement[id];
 }

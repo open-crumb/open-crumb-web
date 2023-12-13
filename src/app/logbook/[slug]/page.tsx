@@ -24,7 +24,17 @@ type EntryData = {
       id: string;
       createdAt: Date;
       modifiedAt: Date;
-      text: string;
+      name: string;
+      quantity: number | null;
+      unit: string | null;
+    }>;
+    measurements: Array<{
+      id: string;
+      createdAt: Date;
+      modifiedAt: Date;
+      name: string;
+      value: number;
+      unit: string;
     }>;
   }>;
 };
@@ -60,7 +70,21 @@ async function getData(slug: string): Promise<Data> {
               id: ingredient.id,
               createdAt: ingredient.createdAt,
               modifiedAt: ingredient.modifiedAt,
-              text: ingredient.text,
+              name: ingredient.name,
+              quantity: ingredient.quantity,
+              unit: ingredient.unit,
+            };
+          }),
+          measurements: update.measurementIDs.map((measurementID) => {
+            const measurement = data.LogbookMeasurement[measurementID];
+
+            return {
+              id: measurement.id,
+              createdAt: measurement.createdAt,
+              modifiedAt: measurement.modifiedAt,
+              name: measurement.name,
+              value: measurement.value,
+              unit: measurement.unit,
             };
           }),
         };
@@ -80,7 +104,7 @@ export default async function LogbookEntryPage({
 
   return (
     <LogbookProvider initialCache={entryDataToCache(data.entry)}>
-      <LogbookEntryBlock id={params.slug} />
+      <LogbookEntryBlock id={data.entry.id} />
     </LogbookProvider>
   );
 }
@@ -132,6 +156,11 @@ function entryDataToCache(entry: EntryData): Cache {
               to: 'LogbookIngredient',
               ids: update.ingredients.map(({ id }) => id),
             },
+            measurements: {
+              type: 'MANY',
+              to: 'LogbookMeasurement',
+              ids: update.measurements.map(({ id }) => id),
+            },
           },
         },
       ]),
@@ -147,7 +176,36 @@ function entryDataToCache(entry: EntryData): Cache {
             isLocal: false,
             entity: {
               id: ingredient.id,
-              text: ingredient.text,
+              name: ingredient.name,
+              quantity:
+                ingredient.quantity !== null ? String(ingredient.quantity) : '',
+              unit: ingredient.unit || '',
+            },
+            references: {
+              update: {
+                type: 'ONE',
+                to: 'LogbookUpdate',
+                id: update.id,
+              },
+            },
+          },
+        ]),
+      ),
+    ),
+    LogbookMeasurement: Object.fromEntries(
+      entry.updates.flatMap((update) =>
+        update.measurements.map((measurement) => [
+          measurement.id,
+          {
+            id: measurement.id,
+            createdAt: measurement.createdAt,
+            modifiedAt: measurement.modifiedAt,
+            isLocal: false,
+            entity: {
+              id: measurement.id,
+              name: measurement.name,
+              value: String(measurement.value),
+              unit: measurement.unit || '',
             },
             references: {
               update: {
