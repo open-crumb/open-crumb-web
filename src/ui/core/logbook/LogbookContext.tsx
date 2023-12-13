@@ -236,7 +236,7 @@ export function useLogbookActions(): {
           entry: {
             type: 'ONE',
             to: 'LogbookEntry',
-            id: 'le.1',
+            id: options.entryID,
           },
           ingredients: {
             type: 'MANY',
