@@ -283,6 +283,10 @@ export function useLogbookActions(): {
         delete cache.LogbookIngredient[id];
       });
 
+      update.references.measurements.ids.forEach((id) => {
+        delete cache.LogbookMeasurement[id];
+      });
+
       eventBus.dispatchEvent(new Event(`LogbookEntry.${entry.id}.UPDATE`));
     },
     createIngredient(options) {

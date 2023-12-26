@@ -11,7 +11,7 @@ export default function NavigationMenuBlock(props: Props) {
   return (
     <nav className="flex gap-4">
       <Link href="/">Home</Link>
-      {props.isSignedIn && <Link href="/logbook">Logbook</Link>}
+      <Link href="/logbook">Logbook</Link>
       <Link href="/calculator">Calculator</Link>
       {!props.isSignedIn && <Link href="/sign-in">Sign In</Link>}
       {props.isSignedIn && (

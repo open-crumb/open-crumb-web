@@ -24,12 +24,12 @@ export const INGREDIENT_UNITS = [
     text: 'lb',
   },
   {
-    value: 'tablespoon',
-    text: 'tbsp',
-  },
-  {
     value: 'teaspoon',
     text: 'tsp',
+  },
+  {
+    value: 'tablespoon',
+    text: 'tbsp',
   },
   {
     value: 'cup',
@@ -49,5 +49,9 @@ export const MEASUREMENT_UNITS = [
   {
     value: 'celsius',
     text: '℃',
+  },
+  {
+    value: 'percent',
+    text: '%',
   },
 ];

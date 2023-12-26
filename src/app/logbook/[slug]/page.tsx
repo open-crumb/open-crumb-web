@@ -1,94 +1,183 @@
-import data from '@/data/logbook';
 import LogbookEntryBlock from '@/ui/core/logbook/entry/LogbookEntryBlock';
 import { Cache, LogbookProvider } from '@/ui/core/logbook/LogbookContext';
 import type { Metadata } from 'next';
+import { request, gql } from 'graphql-request';
 
 export const metadata: Metadata = {
   title: 'Classic Sourdough',
 };
 
-type EntryData = {
-  id: string;
-  createdAt: Date;
-  modifiedAt: Date;
-  title: string;
-  description: string;
-  updates: Array<{
+type GraphQLData = {
+  logbookEntry: {
+    id: string;
+    createdAt: string;
+    modifiedAt: string;
+    title: string;
+    description: string;
+    updates: {
+      edges: Array<{
+        node: {
+          id: string;
+          createdAt: string;
+          modifiedAt: string;
+          date: string;
+          title: string;
+          description: string;
+          ingredients: {
+            edges: Array<{
+              node: {
+                id: string;
+                createdAt: string;
+                modifiedAt: string;
+                name: string;
+                quantity: number | null;
+                unit: string | null;
+              };
+            }>;
+          };
+          measurements: {
+            edges: Array<{
+              node: {
+                id: string;
+                createdAt: string;
+                modifiedAt: string;
+                name: string;
+                value: number | null;
+                unit: string | null;
+              };
+            }>;
+          };
+        };
+      }>;
+    };
+  };
+};
+
+type GraphQLVariables = {
+  slug: string;
+};
+
+type NextJSData = {
+  entry: {
     id: string;
     createdAt: Date;
     modifiedAt: Date;
-    date: Date;
     title: string;
     description: string;
-    ingredients: Array<{
+    updates: Array<{
       id: string;
       createdAt: Date;
       modifiedAt: Date;
-      name: string;
-      quantity: number | null;
-      unit: string | null;
+      date: Date;
+      title: string;
+      description: string;
+      ingredients: Array<{
+        id: string;
+        createdAt: Date;
+        modifiedAt: Date;
+        name: string;
+        quantity: number | null;
+        unit: string | null;
+      }>;
+      measurements: Array<{
+        id: string;
+        createdAt: Date;
+        modifiedAt: Date;
+        name: string;
+        value: number | null;
+        unit: string | null;
+      }>;
     }>;
-    measurements: Array<{
-      id: string;
-      createdAt: Date;
-      modifiedAt: Date;
-      name: string;
-      value: number;
-      unit: string;
-    }>;
-  }>;
+  };
 };
 
-type Data = {
-  entry: EntryData;
-};
-
-async function getData(slug: string): Promise<Data> {
-  const entry = data.LogbookEntry[slug];
+async function getData(slug: string): Promise<NextJSData> {
+  // @todo add proper error handling
+  const data = await request<GraphQLData, GraphQLVariables>(
+    process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT!,
+    gql`
+      query LogbookPageQuery($slug: String!) {
+        logbookEntry(slug: $slug) {
+          id
+          createdAt
+          modifiedAt
+          title
+          description
+          updates {
+            edges {
+              node {
+                id
+                createdAt
+                modifiedAt
+                date
+                title
+                description
+                ingredients {
+                  edges {
+                    node {
+                      id
+                      createdAt
+                      modifiedAt
+                      name
+                      quantity
+                      unit
+                    }
+                  }
+                }
+                measurements {
+                  edges {
+                    node {
+                      id
+                      createdAt
+                      modifiedAt
+                      name
+                      value
+                      unit
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    `,
+    { slug },
+  );
 
   return {
     entry: {
-      id: entry.id,
-      createdAt: entry.createdAt,
-      modifiedAt: entry.modifiedAt,
-      title: entry.title,
-      description: entry.description,
-      updates: entry.updateIDs.map((updateID) => {
-        const update = data.LogbookUpdate[updateID];
-
-        return {
-          id: update.id,
-          createdAt: update.createdAt,
-          modifiedAt: update.modifiedAt,
-          date: update.date,
-          title: update.title,
-          description: update.description,
-          ingredients: update.ingredientIDs.map((ingredientID) => {
-            const ingredient = data.LogbookIngredient[ingredientID];
-
-            return {
-              id: ingredient.id,
-              createdAt: ingredient.createdAt,
-              modifiedAt: ingredient.modifiedAt,
-              name: ingredient.name,
-              quantity: ingredient.quantity,
-              unit: ingredient.unit,
-            };
+      id: data.logbookEntry.id,
+      createdAt: new Date(data.logbookEntry.createdAt),
+      modifiedAt: new Date(data.logbookEntry.modifiedAt),
+      title: data.logbookEntry.title,
+      description: data.logbookEntry.description,
+      updates: data.logbookEntry.updates.edges.map(({ node: update }) => ({
+        id: update.id,
+        createdAt: new Date(update.createdAt),
+        modifiedAt: new Date(update.modifiedAt),
+        date: new Date(update.date),
+        title: update.title,
+        description: update.description,
+        ingredients: update.ingredients.edges.map(({ node: ingredient }) => ({
+          id: ingredient.id,
+          createdAt: new Date(ingredient.createdAt),
+          modifiedAt: new Date(ingredient.modifiedAt),
+          name: ingredient.name,
+          quantity: ingredient.quantity,
+          unit: ingredient.unit,
+        })),
+        measurements: update.measurements.edges.map(
+          ({ node: measurement }) => ({
+            id: measurement.id,
+            createdAt: new Date(measurement.createdAt),
+            modifiedAt: new Date(measurement.modifiedAt),
+            name: measurement.name,
+            value: measurement.value,
+            unit: measurement.unit,
           }),
-          measurements: update.measurementIDs.map((measurementID) => {
-            const measurement = data.LogbookMeasurement[measurementID];
-
-            return {
-              id: measurement.id,
-              createdAt: measurement.createdAt,
-              modifiedAt: measurement.modifiedAt,
-              name: measurement.name,
-              value: measurement.value,
-              unit: measurement.unit,
-            };
-          }),
-        };
-      }),
+        ),
+      })),
     },
   };
 }
@@ -109,7 +198,7 @@ export default async function LogbookEntryPage({
   );
 }
 
-function entryDataToCache(entry: EntryData): Cache {
+function entryDataToCache(entry: NextJSData['entry']): Cache {
   return {
     LogbookEntry: {
       [entry.id]: {

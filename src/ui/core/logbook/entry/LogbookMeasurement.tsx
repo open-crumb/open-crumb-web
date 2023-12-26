@@ -63,15 +63,6 @@ export default function LogbookMeasurement(props: Props) {
             ))}
           </Select.Content>
         </Select.Root>
-        {/* <TextField.Input
-          value={ingredient.entity.unit}
-          onChange={(unit) => {
-            setMeasurement({
-              id: props.id,
-              unit,
-            });
-          }}
-        /> */}
       </div>
       <div className="flex-shrink">
         <Button

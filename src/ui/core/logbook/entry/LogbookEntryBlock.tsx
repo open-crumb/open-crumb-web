@@ -14,6 +14,7 @@ import LogbookUpdate from '@/ui/core/logbook/entry/LogbookUpdate';
 import TextField from '@/ui/design/TextField';
 import TextArea from '@/ui/design/TextArea';
 import Button from '@/ui/design/Button';
+import { PlusIcon } from '@radix-ui/react-icons';
 
 type Props = {
   id: string;
@@ -50,7 +51,7 @@ export default function LogbookEntryBlock(props: Props) {
           createUpdate({ entryID: entry.id });
         }}
       >
-        New Update
+        <PlusIcon className="mr-1" /> New Update
       </Button>
       {entry.references.updates.ids.map((id) => (
         <div key={id} className="mt-8">
