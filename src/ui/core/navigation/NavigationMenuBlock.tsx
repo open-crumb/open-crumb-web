@@ -13,12 +13,13 @@ export default function NavigationMenuBlock(props: Props) {
       <Link href="/">Home</Link>
       <Link href="/logbook">Logbook</Link>
       <Link href="/calculator">Calculator</Link>
-      {!props.isSignedIn && <Link href="/sign-in">Sign In</Link>}
-      {props.isSignedIn && (
+      {!props.isSignedIn && <Link href="/api/auth/sign-in">Sign In</Link>}
+      {props.isSignedIn && <Link href="/api/auth/sign-out">Sign Out</Link>}
+      {/* {props.isSignedIn && (
         <form action={signOutAction}>
           <button type="submit">Sign Out</button>
         </form>
-      )}
+      )} */}
     </nav>
   );
 }

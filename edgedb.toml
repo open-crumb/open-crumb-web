@@ -1,0 +1,5 @@
+[edgedb]
+server-version = "4.3"
+
+[project]
+schema-dir = "src/dbschema"

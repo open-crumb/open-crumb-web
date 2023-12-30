@@ -1,57 +1,65 @@
 export const INGREDIENT_UNITS = [
   {
-    value: 'gram',
+    value: 'MassGram',
     text: 'g',
   },
   {
-    value: 'kilogram',
+    value: 'MassKilogram',
     text: 'kg',
   },
   {
-    value: 'mililiter',
+    value: 'VolumeMilliliter',
     text: 'mL',
   },
   {
-    value: 'liter',
+    value: 'VolumeLiter',
     text: 'L',
   },
   {
-    value: 'ounce',
+    value: 'MassOunce',
     text: 'oz',
   },
   {
-    value: 'pound',
+    value: 'MassPound',
     text: 'lb',
   },
   {
-    value: 'teaspoon',
+    value: 'VolumeTeaspoon',
     text: 'tsp',
   },
   {
-    value: 'tablespoon',
+    value: 'VolumeTablespoon',
     text: 'tbsp',
   },
   {
-    value: 'cup',
+    value: 'VolumeCup',
     text: 'cup',
   },
   {
-    value: 'gallon',
+    value: 'VolumePint',
+    text: 'pt',
+  },
+  {
+    value: 'VolumeQuart',
+    text: 'qt',
+  },
+  {
+    value: 'VolumeGallon',
     text: 'gal',
   },
 ];
 
 export const MEASUREMENT_UNITS = [
   {
-    value: 'fahrenheit',
+    value: 'TemperatureFahrenheit',
     text: '℉',
   },
   {
-    value: 'celsius',
+    value: 'TemperatureCelsius',
     text: '℃',
   },
   {
-    value: 'percent',
+    value: 'Percent',
     text: '%',
   },
 ];
