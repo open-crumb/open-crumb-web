@@ -9,6 +9,9 @@ export default class UserDataSource {
     this.edgedb = edgedb;
   }
 
+  /**
+   * Gets a user by ID. Returns `null` if not found.
+   */
   async getUserByID(id: string): Promise<UserModel | null> {
     const query = e.select(e.User, (user) => ({
       id: true,

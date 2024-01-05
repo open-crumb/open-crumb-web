@@ -1,23 +1,10 @@
 import LogbookBlock from '@/ui/core/logbook/LogbookBlock';
 import type { Metadata } from 'next';
 import { request, gql } from 'graphql-request';
+import { LogbookPageQuery } from '@/ui/graphql/graphql';
 
 export const metadata: Metadata = {
   title: 'Logbook',
-};
-
-type GraphQLData = {
-  me: {
-    logbookEntries: {
-      edges: Array<{
-        node: {
-          id: string;
-          slug: string;
-          title: string;
-        };
-      }>;
-    };
-  };
 };
 
 type NextJSData = {
@@ -30,10 +17,10 @@ type NextJSData = {
 
 async function getData(): Promise<NextJSData> {
   // @todo add proper error handling
-  const data = await request<GraphQLData>(
+  const data = await request<LogbookPageQuery>(
     process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT!,
     gql`
-      query LogbookPageQuery {
+      query LogbookPage {
         me {
           logbookEntries {
             edges {
@@ -48,6 +35,12 @@ async function getData(): Promise<NextJSData> {
       }
     `,
   );
+
+  if (!data || !data.me) {
+    return {
+      entries: [],
+    };
+  }
 
   return {
     entries: data.me.logbookEntries.edges.map((edge) => ({

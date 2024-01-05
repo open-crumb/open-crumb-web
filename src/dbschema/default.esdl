@@ -15,6 +15,7 @@ module default {
       readonly := true;
     };
     required modifiedAt: datetime {
+      default := datetime_current();
       rewrite insert, update using (datetime_current());
     };
   }

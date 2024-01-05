@@ -2,16 +2,7 @@ import { encodeGlobalID } from '@pothos/plugin-relay';
 import builder from '@/server/graphql/builder';
 import { LogbookUpdateType } from '@/server/graphql/schema/logbook-update';
 import MeasurementUnit from '@/server/graphql/schema/measurement-unit-enum';
-
-export type LogbookMeasurementModel = {
-  id: string;
-  createdAt: Date;
-  modifiedAt: Date;
-  archivedAt: Date | null;
-  name: string;
-  value: number | null;
-  unit: 'TemperatureFahrenheit' | 'TemperatureCelsius' | 'Percent' | null;
-};
+import { LogbookMeasurementModel } from '@/server/data/LogbookDataSource';
 
 export const LogbookMeasurementType =
   builder.objectRef<LogbookMeasurementModel>('LogbookMeasurement');

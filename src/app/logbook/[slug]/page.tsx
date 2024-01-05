@@ -2,59 +2,14 @@ import LogbookEntryBlock from '@/ui/core/logbook/entry/LogbookEntryBlock';
 import { Cache, LogbookProvider } from '@/ui/core/logbook/LogbookContext';
 import type { Metadata } from 'next';
 import { request, gql } from 'graphql-request';
+import {
+  LogbookEntryPageQuery,
+  LogbookEntryPageQueryVariables,
+} from '@/ui/graphql/graphql';
+import { redirect } from 'next/navigation';
 
 export const metadata: Metadata = {
   title: 'Classic Sourdough',
-};
-
-type GraphQLData = {
-  logbookEntry: {
-    id: string;
-    createdAt: string;
-    modifiedAt: string;
-    title: string;
-    description: string;
-    updates: {
-      edges: Array<{
-        node: {
-          id: string;
-          createdAt: string;
-          modifiedAt: string;
-          date: string;
-          title: string;
-          description: string;
-          ingredients: {
-            edges: Array<{
-              node: {
-                id: string;
-                createdAt: string;
-                modifiedAt: string;
-                name: string;
-                quantity: number | null;
-                unit: string | null;
-              };
-            }>;
-          };
-          measurements: {
-            edges: Array<{
-              node: {
-                id: string;
-                createdAt: string;
-                modifiedAt: string;
-                name: string;
-                value: number | null;
-                unit: string | null;
-              };
-            }>;
-          };
-        };
-      }>;
-    };
-  };
-};
-
-type GraphQLVariables = {
-  slug: string;
 };
 
 type NextJSData = {
@@ -93,10 +48,13 @@ type NextJSData = {
 
 async function getData(slug: string): Promise<NextJSData> {
   // @todo add proper error handling
-  const data = await request<GraphQLData, GraphQLVariables>(
+  const data = await request<
+    LogbookEntryPageQuery,
+    LogbookEntryPageQueryVariables
+  >(
     process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT!,
     gql`
-      query LogbookPageQuery($slug: String!) {
+      query LogbookEntryPage($slug: String!) {
         logbookEntry(slug: $slug) {
           id
           createdAt
@@ -144,6 +102,10 @@ async function getData(slug: string): Promise<NextJSData> {
     `,
     { slug },
   );
+
+  if (!data || !data.logbookEntry) {
+    redirect('/logbook');
+  }
 
   return {
     entry: {

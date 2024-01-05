@@ -2,30 +2,7 @@ import { encodeGlobalID } from '@pothos/plugin-relay';
 import builder from '@/server/graphql/builder';
 import { LogbookUpdateType } from '@/server/graphql/schema/logbook-update';
 import IngredientUnit from '@/server/graphql/schema/ingredient-unit-enum';
-
-export type LogbookIngredientModel = {
-  id: string;
-  createdAt: Date;
-  modifiedAt: Date;
-  archivedAt: Date | null;
-  name: string;
-  quantity: number | null;
-  unit:
-    | 'MassGram'
-    | 'MassKilogram'
-    | 'VolumeMilliliter'
-    | 'VolumeLiter'
-    | 'MassOunce'
-    | 'MassPound'
-    | 'VolumeTeaspoon'
-    | 'VolumeTablespoon'
-    | 'VolumeCup'
-    | 'VolumeFluidOunce'
-    | 'VolumePint'
-    | 'VolumeQuart'
-    | 'VolumeGallon'
-    | null;
-};
+import { LogbookIngredientModel } from '@/server/data/LogbookDataSource';
 
 export const LogbookIngredientType =
   builder.objectRef<LogbookIngredientModel>('LogbookIngredient');

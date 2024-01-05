@@ -1,4 +1,9 @@
-export const INGREDIENT_UNITS = [
+import { IngredientUnit, MeasurementUnit } from '@/ui/graphql/graphql';
+
+export const INGREDIENT_UNITS: Array<{
+  value: IngredientUnit;
+  text: string;
+}> = [
   {
     value: 'MassGram',
     text: 'g',
@@ -49,7 +54,10 @@ export const INGREDIENT_UNITS = [
   },
 ];
 
-export const MEASUREMENT_UNITS = [
+export const MEASUREMENT_UNITS: Array<{
+  value: MeasurementUnit;
+  text: string;
+}> = [
   {
     value: 'TemperatureFahrenheit',
     text: '℉',

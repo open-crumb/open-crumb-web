@@ -19,6 +19,31 @@
 
 import createID from '@/lib/create-id';
 import {
+  ArchiveLogbookIngredientMutation,
+  ArchiveLogbookIngredientMutationVariables,
+  ArchiveLogbookMeasurementMutation,
+  ArchiveLogbookMeasurementMutationVariables,
+  ArchiveLogbookUpdateMutation,
+  ArchiveLogbookUpdateMutationVariables,
+  CreateLogbookIngredientMutation,
+  CreateLogbookIngredientMutationVariables,
+  CreateLogbookMeasurementMutation,
+  CreateLogbookMeasurementMutationVariables,
+  CreateLogbookUpdateMutation,
+  CreateLogbookUpdateMutationVariables,
+  IngredientUnit,
+  MeasurementUnit,
+  SetLogbookEntryMutation,
+  SetLogbookEntryMutationVariables,
+  SetLogbookIngredientMutation,
+  SetLogbookIngredientMutationVariables,
+  SetLogbookMeasurementMutation,
+  SetLogbookMeasurementMutationVariables,
+  SetLogbookUpdateMutation,
+  SetLogbookUpdateMutationVariables,
+} from '@/ui/graphql/graphql';
+import request, { gql } from 'graphql-request';
+import {
   createContext,
   RefObject,
   useContext,
@@ -176,37 +201,41 @@ function useEventBus(): EventTarget {
 }
 
 export function useLogbookActions(): {
-  setEntry(options: { id: ID; title?: string; description?: string }): void;
-  createUpdate(options: { entryID: ID }): void;
+  setEntry(options: {
+    id: ID;
+    title?: string;
+    description?: string;
+  }): Promise<void>;
+  createUpdate(options: { entryID: ID }): Promise<void>;
   setUpdate(options: {
     id: ID;
     title?: string;
     description?: string;
     date?: Date;
-  }): void;
-  deleteUpdate(options: { id: ID }): void;
-  createIngredient(options: { updateID: ID }): void;
+  }): Promise<void>;
+  deleteUpdate(options: { id: ID }): Promise<void>;
+  createIngredient(options: { updateID: ID }): Promise<void>;
   setIngredient(options: {
     id: ID;
     name?: string;
     quantity?: string;
-    unit?: string;
-  }): void;
-  deleteIngredient(options: { id: ID }): void;
-  createMeasurement(options: { updateID: ID }): void;
+    unit?: IngredientUnit;
+  }): Promise<void>;
+  deleteIngredient(options: { id: ID }): Promise<void>;
+  createMeasurement(options: { updateID: ID }): Promise<void>;
   setMeasurement(options: {
     id: ID;
     name?: string;
     value?: string;
-    unit?: string;
-  }): void;
-  deleteMeasurement(options: { id: ID }): void;
+    unit?: MeasurementUnit;
+  }): Promise<void>;
+  deleteMeasurement(options: { id: ID }): Promise<void>;
 } {
   const cache = useCache();
   const eventBus = useEventBus();
 
   return {
-    setEntry(options) {
+    async setEntry(options) {
       cache.LogbookEntry[options.id] = {
         ...cache.LogbookEntry[options.id],
         modifiedAt: new Date(),
@@ -217,8 +246,44 @@ export function useLogbookActions(): {
       };
 
       eventBus.dispatchEvent(new Event(`LogbookEntry.${options.id}.UPDATE`));
+
+      // @todo add batching to reduce request load
+      const data = await request<
+        SetLogbookEntryMutation,
+        SetLogbookEntryMutationVariables
+      >(
+        process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT!,
+        gql`
+          mutation SetLogbookEntry(
+            $id: ID!
+            $title: String
+            $description: String
+          ) {
+            result: setLogbookEntry(
+              id: $id
+              title: $title
+              description: $description
+            ) {
+              __typename
+              ... on SetLogbookEntryFail {
+                error
+              }
+            }
+          }
+        `,
+        {
+          id: options.id,
+          title: options.title,
+          description: options.description,
+        },
+      );
+
+      if (data.result.__typename === 'SetLogbookEntryFail') {
+        // @todo add proper error handling
+        console.error(data.result.error);
+      }
     },
-    createUpdate(options) {
+    async createUpdate(options) {
       const id = createID('LogbookUpdate');
 
       cache.LogbookUpdate[id] = {
@@ -256,8 +321,32 @@ export function useLogbookActions(): {
       eventBus.dispatchEvent(
         new Event(`LogbookEntry.${options.entryID}.UPDATE`),
       );
+
+      // @todo add batching to reduce request load
+      const data = await request<
+        CreateLogbookUpdateMutation,
+        CreateLogbookUpdateMutationVariables
+      >(
+        process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT!,
+        gql`
+          mutation CreateLogbookUpdate($entryID: ID!) {
+            result: createLogbookUpdate(entryID: $entryID) {
+              __typename
+              ... on CreateLogbookUpdateFail {
+                error
+              }
+            }
+          }
+        `,
+        { entryID: options.entryID },
+      );
+
+      if (data.result.__typename === 'CreateLogbookUpdateFail') {
+        // @todo add proper error handling
+        console.error(data.result.error);
+      }
     },
-    setUpdate(options) {
+    async setUpdate(options) {
       cache.LogbookUpdate[options.id] = {
         ...cache.LogbookUpdate[options.id],
         modifiedAt: new Date(),
@@ -268,8 +357,47 @@ export function useLogbookActions(): {
       };
 
       eventBus.dispatchEvent(new Event(`LogbookUpdate.${options.id}.UPDATE`));
+
+      // @todo add batching to reduce request load
+      const data = await request<
+        SetLogbookUpdateMutation,
+        SetLogbookUpdateMutationVariables
+      >(
+        process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT!,
+        gql`
+          mutation SetLogbookUpdate(
+            $id: ID!
+            $date: Date
+            $title: String
+            $description: String
+          ) {
+            result: setLogbookUpdate(
+              id: $id
+              date: $date
+              title: $title
+              description: $description
+            ) {
+              __typename
+              ... on SetLogbookUpdateFail {
+                error
+              }
+            }
+          }
+        `,
+        {
+          id: options.id,
+          date: options.date,
+          title: options.title,
+          description: options.description,
+        },
+      );
+
+      if (data.result.__typename === 'SetLogbookUpdateFail') {
+        // @todo add proper error handling
+        console.error(data.result.error);
+      }
     },
-    deleteUpdate(options) {
+    async deleteUpdate(options) {
       const update = cache.LogbookUpdate[options.id];
       const entry = cache.LogbookEntry[update.references.entry.id];
 
@@ -288,8 +416,31 @@ export function useLogbookActions(): {
       });
 
       eventBus.dispatchEvent(new Event(`LogbookEntry.${entry.id}.UPDATE`));
+
+      const data = await request<
+        ArchiveLogbookUpdateMutation,
+        ArchiveLogbookUpdateMutationVariables
+      >(
+        process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT!,
+        gql`
+          mutation ArchiveLogbookUpdate($id: ID!) {
+            result: archiveLogbookUpdate(id: $id) {
+              __typename
+              ... on ArchiveLogbookUpdateFail {
+                error
+              }
+            }
+          }
+        `,
+        { id: options.id },
+      );
+
+      if (data.result.__typename === 'ArchiveLogbookUpdateFail') {
+        // @todo add proper error handling
+        console.error(data.result.error);
+      }
     },
-    createIngredient(options) {
+    async createIngredient(options) {
       const id = createID('LogbookIngredient');
 
       cache.LogbookIngredient[id] = {
@@ -301,7 +452,7 @@ export function useLogbookActions(): {
           id,
           name: '',
           quantity: '',
-          unit: 'gram',
+          unit: 'MassGram',
         },
         references: {
           update: {
@@ -317,8 +468,38 @@ export function useLogbookActions(): {
       eventBus.dispatchEvent(
         new Event(`LogbookUpdate.${options.updateID}.UPDATE`),
       );
+
+      // @todo add batching to reduce request load
+      const data = await request<
+        CreateLogbookIngredientMutation,
+        CreateLogbookIngredientMutationVariables
+      >(
+        process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT!,
+        gql`
+          mutation CreateLogbookIngredient(
+            $updateID: ID!
+            $unit: IngredientUnit!
+          ) {
+            result: createLogbookIngredient(updateID: $updateID, unit: $unit) {
+              __typename
+              ... on CreateLogbookIngredientFail {
+                error
+              }
+            }
+          }
+        `,
+        {
+          updateID: options.updateID,
+          unit: 'MassGram',
+        },
+      );
+
+      if (data.result.__typename === 'CreateLogbookIngredientFail') {
+        // @todo add proper error handling
+        console.error(data.result.error);
+      }
     },
-    setIngredient(options) {
+    async setIngredient(options) {
       cache.LogbookIngredient[options.id] = {
         ...cache.LogbookIngredient[options.id],
         modifiedAt: new Date(),
@@ -331,8 +512,51 @@ export function useLogbookActions(): {
       eventBus.dispatchEvent(
         new Event(`LogbookIngredient.${options.id}.UPDATE`),
       );
+
+      // `quantity` is input as a string (from the `<input />` field). We need
+      // to make sure it is a valid number.
+      const quantity = options.quantity ? parseFloat(options.quantity) : null;
+
+      // @todo add batching to reduce request load
+      const data = await request<
+        SetLogbookIngredientMutation,
+        SetLogbookIngredientMutationVariables
+      >(
+        process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT!,
+        gql`
+          mutation SetLogbookIngredient(
+            $id: ID!
+            $name: String
+            $quantity: Float
+            $unit: IngredientUnit
+          ) {
+            result: setLogbookIngredient(
+              id: $id
+              name: $name
+              quantity: $quantity
+              unit: $unit
+            ) {
+              __typename
+              ... on SetLogbookIngredientFail {
+                error
+              }
+            }
+          }
+        `,
+        {
+          id: options.id,
+          name: options.name,
+          quantity: Number.isFinite(quantity) ? quantity : null,
+          unit: options.unit,
+        },
+      );
+
+      if (data.result.__typename === 'SetLogbookIngredientFail') {
+        // @todo add proper error handling
+        console.error(data.result.error);
+      }
     },
-    deleteIngredient(options) {
+    async deleteIngredient(options) {
       const ingredient = cache.LogbookIngredient[options.id];
       const update = cache.LogbookUpdate[ingredient.references.update.id];
 
@@ -342,8 +566,31 @@ export function useLogbookActions(): {
         update.references.ingredients.ids.filter((id) => id !== options.id);
 
       eventBus.dispatchEvent(new Event(`LogbookUpdate.${update.id}.UPDATE`));
+
+      const data = await request<
+        ArchiveLogbookIngredientMutation,
+        ArchiveLogbookIngredientMutationVariables
+      >(
+        process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT!,
+        gql`
+          mutation ArchiveLogbookIngredient($id: ID!) {
+            result: archiveLogbookIngredient(id: $id) {
+              __typename
+              ... on ArchiveLogbookIngredientFail {
+                error
+              }
+            }
+          }
+        `,
+        { id: options.id },
+      );
+
+      if (data.result.__typename === 'ArchiveLogbookIngredientFail') {
+        // @todo add proper error handling
+        console.error(data.result.error);
+      }
     },
-    createMeasurement(options) {
+    async createMeasurement(options) {
       const id = createID('LogbookMeasurement');
 
       cache.LogbookMeasurement[id] = {
@@ -355,7 +602,7 @@ export function useLogbookActions(): {
           id,
           name: '',
           value: '',
-          unit: 'fahrenheit',
+          unit: '',
         },
         references: {
           update: {
@@ -373,8 +620,32 @@ export function useLogbookActions(): {
       eventBus.dispatchEvent(
         new Event(`LogbookUpdate.${options.updateID}.UPDATE`),
       );
+
+      // @todo add batching to reduce request load
+      const data = await request<
+        CreateLogbookMeasurementMutation,
+        CreateLogbookMeasurementMutationVariables
+      >(
+        process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT!,
+        gql`
+          mutation CreateLogbookMeasurement($updateID: ID!) {
+            result: createLogbookMeasurement(updateID: $updateID) {
+              __typename
+              ... on CreateLogbookMeasurementFail {
+                error
+              }
+            }
+          }
+        `,
+        { updateID: options.updateID },
+      );
+
+      if (data.result.__typename === 'CreateLogbookMeasurementFail') {
+        // @todo add proper error handling
+        console.error(data.result.error);
+      }
     },
-    setMeasurement(options) {
+    async setMeasurement(options) {
       cache.LogbookMeasurement[options.id] = {
         ...cache.LogbookMeasurement[options.id],
         modifiedAt: new Date(),
@@ -387,8 +658,51 @@ export function useLogbookActions(): {
       eventBus.dispatchEvent(
         new Event(`LogbookMeasurement.${options.id}.UPDATE`),
       );
+
+      // `value` is input as a string (from the `<input />` field). We need to
+      // make sure it is a valid number.
+      const value = options.value ? parseFloat(options.value) : null;
+
+      // @todo add batching to reduce request load
+      const data = await request<
+        SetLogbookMeasurementMutation,
+        SetLogbookMeasurementMutationVariables
+      >(
+        process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT!,
+        gql`
+          mutation SetLogbookMeasurement(
+            $id: ID!
+            $name: String
+            $value: Float
+            $unit: MeasurementUnit
+          ) {
+            result: setLogbookMeasurement(
+              id: $id
+              name: $name
+              value: $value
+              unit: $unit
+            ) {
+              __typename
+              ... on SetLogbookMeasurementFail {
+                error
+              }
+            }
+          }
+        `,
+        {
+          id: options.id,
+          name: options.name,
+          value: Number.isFinite(value) ? value : null,
+          unit: options.unit,
+        },
+      );
+
+      if (data.result.__typename === 'SetLogbookMeasurementFail') {
+        // @todo add proper error handling
+        console.error(data.result.error);
+      }
     },
-    deleteMeasurement(options) {
+    async deleteMeasurement(options) {
       const measurement = cache.LogbookMeasurement[options.id];
       const update = cache.LogbookUpdate[measurement.references.update.id];
 
@@ -398,6 +712,29 @@ export function useLogbookActions(): {
         update.references.measurements.ids.filter((id) => id !== options.id);
 
       eventBus.dispatchEvent(new Event(`LogbookUpdate.${update.id}.UPDATE`));
+
+      const data = await request<
+        ArchiveLogbookMeasurementMutation,
+        ArchiveLogbookMeasurementMutationVariables
+      >(
+        process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT!,
+        gql`
+          mutation ArchiveLogbookMeasurement($id: ID!) {
+            result: archiveLogbookMeasurement(id: $id) {
+              __typename
+              ... on ArchiveLogbookMeasurementFail {
+                error
+              }
+            }
+          }
+        `,
+        { id: options.id },
+      );
+
+      if (data.result.__typename === 'ArchiveLogbookMeasurementFail') {
+        // @todo add proper error handling
+        console.error(data.result.error);
+      }
     },
   };
 }

@@ -24,6 +24,7 @@ builder.node(UserType, {
     modifiedAt: t.expose('modifiedAt', {
       type: 'Date',
     }),
+    // @todo formalize shape
     // email: t.exposeString('email'),
     // username: t.exposeString('username'),
     name: t.exposeString('name'),

@@ -39,3 +39,7 @@ next-env.d.ts
 
 # EdgeDB
 src/dbschema/edgeql-js
+
+# GraphQL Codegen
+graphql.schema.json
+src/ui/graphql

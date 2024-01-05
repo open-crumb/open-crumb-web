@@ -1,15 +1,7 @@
 import { encodeGlobalID } from '@pothos/plugin-relay';
 import builder from '@/server/graphql/builder';
 import { UserType } from '@/server/graphql/schema/user';
-
-export type LogbookEntryModel = {
-  id: string;
-  createdAt: Date;
-  modifiedAt: Date;
-  archivedAt: Date | null;
-  title: string;
-  description: string;
-};
+import { LogbookEntryModel } from '@/server/data/LogbookDataSource';
 
 export const LogbookEntryType =
   builder.objectRef<LogbookEntryModel>('LogbookEntry');
