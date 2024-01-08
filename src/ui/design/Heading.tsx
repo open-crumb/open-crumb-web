@@ -1,4 +1,4 @@
-import classNames from 'classnames';
+import { cn } from '@/lib/shadcn';
 
 type Props = {
   level?: '1' | '2' | '3' | '4' | '5' | '6';
@@ -11,7 +11,7 @@ export default function Heading({ level = '1', children, className }: Props) {
 
   return (
     <Element
-      className={classNames(
+      className={cn(
         'font-semibold',
         {
           'text-3xl': Element === 'h1',

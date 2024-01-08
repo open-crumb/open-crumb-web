@@ -1,28 +1,36 @@
-import React, { ChangeEvent } from 'react';
-import classNames from 'classnames';
+/**
+ * @see https://ui.shadcn.com/docs/components/textarea
+ */
+import React from 'react';
 
-type Props = {
-  value: string;
-  onChange: (value: string, event: ChangeEvent<HTMLTextAreaElement>) => void;
-  placeholder?: string;
-  name?: string;
-  id?: string;
-  'aria-label'?: string;
-  rows?: number;
+import { cn } from '@/lib/shadcn';
+
+export type TextareaProps = Omit<
+  React.TextareaHTMLAttributes<HTMLTextAreaElement>,
+  'onChange'
+> & {
+  onChange: (
+    value: string,
+    event: React.ChangeEvent<HTMLTextAreaElement>,
+  ) => void;
 };
 
-export const TextArea = React.forwardRef<React.ElementRef<'textarea'>, Props>(
-  ({ onChange, rows = 2, ...props }, forwardedRef) => (
-    <textarea
-      className={classNames('block', 'w-full', 'outline-none', 'py-2')}
-      onChange={(event) => onChange(event.target.value, event)}
-      ref={forwardedRef}
-      rows={rows}
-      {...props}
-    />
-  ),
+const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
+  ({ className, onChange, ...props }, ref) => {
+    return (
+      <textarea
+        className={cn(
+          'block min-h-[80px] w-full bg-transparent py-2 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50',
+          className,
+        )}
+        onChange={(event) => onChange(event.target.value, event)}
+        ref={ref}
+        {...props}
+      />
+    );
+  },
 );
 
-TextArea.displayName = 'TextArea';
+Textarea.displayName = 'Textarea';
 
-export default TextArea;
+export { Textarea };

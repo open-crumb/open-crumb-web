@@ -3,10 +3,17 @@ import {
   useLogbookActions,
   useLogbookMeasurement,
 } from '@/ui/core/logbook/LogbookContext';
-import Button from '@/ui/design/Button';
-import Select from '@/ui/design/Select';
-import TextField from '@/ui/design/TextField';
-import { Cross1Icon } from '@radix-ui/react-icons';
+import { Button } from '@/ui/design/button';
+import { Input } from '@/ui/design/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/ui/design/select';
+import { MeasurementUnit } from '@/ui/graphql/graphql';
+import { X as DeleteIcon } from 'lucide-react';
 
 type Props = {
   id: string;
@@ -19,7 +26,7 @@ export default function LogbookMeasurement(props: Props) {
   return (
     <div className="flex items-center gap-2">
       <div className="flex-[4]">
-        <TextField.Input
+        <Input
           value={ingredient.entity.name}
           onChange={(name) => {
             setMeasurement({
@@ -31,7 +38,7 @@ export default function LogbookMeasurement(props: Props) {
         />
       </div>
       <div className="flex-[1]">
-        <TextField.Input
+        <Input
           type="number"
           value={ingredient.entity.value}
           onChange={(value) => {
@@ -41,36 +48,40 @@ export default function LogbookMeasurement(props: Props) {
             });
           }}
           placeholder="80"
-          align="right"
+          className="text-right"
         />
       </div>
       <div className="flex-[1]">
-        <Select.Root
+        <Select
           value={ingredient.entity.unit}
           onValueChange={(unit) => {
             setMeasurement({
               id: props.id,
-              unit,
+              unit: unit as MeasurementUnit,
             });
           }}
         >
-          <Select.Trigger />
-          <Select.Content>
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
             {MEASUREMENT_UNITS.map(({ value, text }) => (
-              <Select.Item key={value} value={value}>
+              <SelectItem key={value} value={value}>
                 {text}
-              </Select.Item>
+              </SelectItem>
             ))}
-          </Select.Content>
-        </Select.Root>
+          </SelectContent>
+        </Select>
       </div>
       <div className="flex-shrink">
         <Button
+          variant="ghost"
           onClick={() => {
             deleteMeasurement({ id: props.id });
           }}
+          size="icon"
         >
-          <Cross1Icon aria-label="Delete Ingredient" />
+          <DeleteIcon aria-label="Delete Ingredient" className="h-4 w-4" />
         </Button>
       </div>
     </div>

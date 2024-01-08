@@ -1,10 +1,10 @@
 'use client';
 
 import { signInAction, SignInState } from '@/app/sign-in/actions';
-import Button from '@/ui/design/Button';
+import { Button } from '@/ui/design/button';
 import Heading from '@/ui/design/Heading';
-import TextField from '@/ui/design/TextField';
-import { EyeNoneIcon, EyeOpenIcon } from '@radix-ui/react-icons';
+import { Input, InputContainer, InputSlot } from '@/ui/design/input';
+import { EyeIcon, EyeOffIcon } from 'lucide-react';
 import { useState } from 'react';
 import { useFormState } from 'react-dom';
 
@@ -18,7 +18,7 @@ export default function SignInBlock() {
     <>
       <Heading level="2">Sign In</Heading>
       <form action={action} className="mt-2">
-        <TextField.Input
+        <Input
           aria-label="Email"
           name="email"
           type="email"
@@ -26,8 +26,8 @@ export default function SignInBlock() {
           value={email}
           onChange={(email) => setEmail(email)}
         />
-        <TextField.Root>
-          <TextField.Input
+        <InputContainer>
+          <Input
             aria-label="Password"
             name="password"
             type={isPasswordVisible ? 'text' : 'password'}
@@ -35,21 +35,26 @@ export default function SignInBlock() {
             value={password}
             onChange={(password) => setPassword(password)}
           />
-          <TextField.Slot>
+          <InputSlot>
             <Button
+              type="button"
+              variant="ghost"
               onClick={() => {
                 setIsPasswordVisible(!isPasswordVisible);
               }}
+              size="icon"
             >
               {isPasswordVisible ? (
-                <EyeNoneIcon aria-label="Hide Password" />
+                <EyeOffIcon aria-label="Hide Password" className="h-4 w-4" />
               ) : (
-                <EyeOpenIcon aria-label="Show Password" />
+                <EyeIcon aria-label="Show Password" className="h-4 w-4" />
               )}
             </Button>
-          </TextField.Slot>
-        </TextField.Root>
-        <Button type="submit">Sign In</Button>
+          </InputSlot>
+        </InputContainer>
+        <Button variant="outline" className="mt-2">
+          Sign In
+        </Button>
       </form>
     </>
   );

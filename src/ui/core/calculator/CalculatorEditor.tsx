@@ -1,16 +1,18 @@
 import { useContext, useId } from 'react';
-import {
-  Cross1Icon,
-  MinusCircledIcon,
-  PlusCircledIcon,
-} from '@radix-ui/react-icons';
-import TextField from '@/ui/design/TextField';
 import CalculatorContext from '@/ui/core/calculator/CalculatorContext';
-import DropdownMenu from '@/ui/design/DropdownMenu';
 import createID from '@/lib/create-id';
-import Button from '@/ui/design/Button';
-import Separator from '@/ui/design/Separator';
+import { Button } from '@/ui/design/button';
+import { Separator } from '@/ui/design/separator';
 import Heading from '@/ui/design/Heading';
+import { Input, InputContainer, InputSlot } from '@/ui/design/input';
+import { PlusIcon, X as TimesIcon, X as DeleteIcon } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuPortal,
+  DropdownMenuTrigger,
+} from '@/ui/design/dropdown-menu';
 
 export default function CalculatorEditor() {
   const doughWeightInputID = useId();
@@ -28,8 +30,8 @@ export default function CalculatorEditor() {
         </label>
         <div className="flex-[1]" />
         <div className="flex-[1]">
-          <TextField.Root>
-            <TextField.Input
+          <InputContainer>
+            <Input
               id={doughWeightInputID}
               type="number"
               value={state.inputs.doughWeight}
@@ -39,11 +41,11 @@ export default function CalculatorEditor() {
                   payload: { doughWeight },
                 });
               }}
-              align="right"
               min="0"
+              className="text-right"
             />
-            <TextField.Slot>g</TextField.Slot>
-          </TextField.Root>
+            <InputSlot>g</InputSlot>
+          </InputContainer>
         </div>
       </div>
       <Separator />
@@ -53,8 +55,8 @@ export default function CalculatorEditor() {
         </label>
         <div className="flex-[1]" />
         <div className="flex-[1]">
-          <TextField.Root>
-            <TextField.Input
+          <InputContainer>
+            <Input
               id={totalFlourInputID}
               type="number"
               value={state.inputs.totalFlourWeight}
@@ -64,11 +66,11 @@ export default function CalculatorEditor() {
                   payload: { totalFlourWeight },
                 });
               }}
-              align="right"
               min="0"
+              className="text-right"
             />
-            <TextField.Slot>g</TextField.Slot>
-          </TextField.Root>
+            <InputSlot>g</InputSlot>
+          </InputContainer>
         </div>
       </div>
       <Separator />
@@ -77,8 +79,8 @@ export default function CalculatorEditor() {
           Hydration
         </label>
         <div className="flex-[1]">
-          <TextField.Root>
-            <TextField.Input
+          <InputContainer>
+            <Input
               id={hydrationInputID}
               type="number"
               value={state.inputs.hydrationPercent}
@@ -88,15 +90,15 @@ export default function CalculatorEditor() {
                   payload: { hydrationPercent },
                 });
               }}
-              align="right"
               min="0"
+              className="text-right"
             />
-            <TextField.Slot>%</TextField.Slot>
-          </TextField.Root>
+            <InputSlot>%</InputSlot>
+          </InputContainer>
         </div>
         <div className="flex-[1]">
-          <TextField.Root>
-            <TextField.Input
+          <InputContainer>
+            <Input
               type="number"
               value={state.inputs.hydrationWeight}
               onChange={(hydrationWeight) => {
@@ -105,12 +107,12 @@ export default function CalculatorEditor() {
                   payload: { hydrationWeight },
                 });
               }}
-              align="right"
               min="0"
+              className="text-right"
               aria-label="Hydration Weight"
             />
-            <TextField.Slot>g</TextField.Slot>
-          </TextField.Root>
+            <InputSlot>g</InputSlot>
+          </InputContainer>
         </div>
       </div>
       <Separator />
@@ -119,8 +121,8 @@ export default function CalculatorEditor() {
           {state.inputs.ingredients[state.inputs.saltID].name}
         </label>
         <div className="flex-[1]">
-          <TextField.Root>
-            <TextField.Input
+          <InputContainer>
+            <Input
               id={saltInputID}
               type="number"
               value={state.inputs.ingredients[state.inputs.saltID].percent}
@@ -133,15 +135,15 @@ export default function CalculatorEditor() {
                   },
                 });
               }}
-              align="right"
               min="0"
+              className="text-right"
             />
-            <TextField.Slot>%</TextField.Slot>
-          </TextField.Root>
+            <InputSlot>%</InputSlot>
+          </InputContainer>
         </div>
         <div className="flex-[1]">
-          <TextField.Root>
-            <TextField.Input
+          <InputContainer>
+            <Input
               type="number"
               value={state.inputs.ingredients[state.inputs.saltID].weight}
               onChange={(weight) => {
@@ -153,12 +155,12 @@ export default function CalculatorEditor() {
                   },
                 });
               }}
-              align="right"
               min="0"
+              className="text-right"
               aria-label="Salt Weight"
             />
-            <TextField.Slot>g</TextField.Slot>
-          </TextField.Root>
+            <InputSlot>g</InputSlot>
+          </InputContainer>
         </div>
       </div>
       {(state.inputs.flourIngredientIDs.length > 0 ||
@@ -193,14 +195,16 @@ export default function CalculatorEditor() {
         </div>
       )}
       <div className="flex justify-end">
-        <DropdownMenu.Root>
-          <DropdownMenu.Trigger>
-            <PlusCircledIcon className="mr-1" />
-            Add Ingredient
-          </DropdownMenu.Trigger>
-          <DropdownMenu.Portal>
-            <DropdownMenu.Content align="end">
-              <DropdownMenu.Item
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline">
+              <PlusIcon className="mr-1 h-4 w-4" />
+              Add Ingredient
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuPortal>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem
                 onClick={() => {
                   dispatch({
                     type: 'ADD_FLOUR_INGREDIENT',
@@ -209,8 +213,8 @@ export default function CalculatorEditor() {
                 }}
               >
                 Flour
-              </DropdownMenu.Item>
-              <DropdownMenu.Item
+              </DropdownMenuItem>
+              <DropdownMenuItem
                 onClick={() => {
                   dispatch({
                     type: 'ADD_LIQUID_INGREDIENT',
@@ -219,9 +223,9 @@ export default function CalculatorEditor() {
                 }}
               >
                 Liquid
-              </DropdownMenu.Item>
+              </DropdownMenuItem>
               {!state.inputs.levain && (
-                <DropdownMenu.Item
+                <DropdownMenuItem
                   onClick={() => {
                     dispatch({
                       type: 'ADD_LEVAIN',
@@ -233,9 +237,9 @@ export default function CalculatorEditor() {
                   }}
                 >
                   Levain
-                </DropdownMenu.Item>
+                </DropdownMenuItem>
               )}
-              <DropdownMenu.Item
+              <DropdownMenuItem
                 onClick={() => {
                   dispatch({
                     type: 'ADD_OTHER_INGREDIENT',
@@ -244,10 +248,10 @@ export default function CalculatorEditor() {
                 }}
               >
                 Other
-              </DropdownMenu.Item>
-            </DropdownMenu.Content>
-          </DropdownMenu.Portal>
-        </DropdownMenu.Root>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenuPortal>
+        </DropdownMenu>
       </div>
       {state.inputs.levain && (
         <div className="mt-4">
@@ -261,8 +265,8 @@ export default function CalculatorEditor() {
         </label>
         <div className="flex-[1]" />
         <div className="flex-[1]">
-          <TextField.Root>
-            <TextField.Input
+          <InputContainer>
+            <Input
               id={multiplierInputID}
               type="number"
               value={state.inputs.multiplier}
@@ -272,17 +276,18 @@ export default function CalculatorEditor() {
                   payload: { multiplier },
                 });
               }}
-              align="right"
+              className="text-right"
               min="0"
             />
-            <TextField.Slot>
-              <Cross1Icon width="10" height="10" />
-            </TextField.Slot>
-          </TextField.Root>
+            <InputSlot>
+              <TimesIcon className="h-4 w-4" />
+            </InputSlot>
+          </InputContainer>
         </div>
       </div>
       <div className="mt-2 flex justify-end">
         <Button
+          variant="outline"
           onClick={() => {
             dispatch({ type: 'NEXT_CLICKED' });
           }}
@@ -306,19 +311,23 @@ function Ingredient({ id }: IngredientProps) {
   return (
     <div className="flex items-center gap-4">
       <div className="flex flex-[2] gap-2">
-        <Button
-          onClick={() => {
-            dispatch({
-              type: 'DELETE_INGREDIENT',
-              payload: { id: ingredient.id },
-            });
-          }}
-          aria-label="Delete Ingredient"
-        >
-          <MinusCircledIcon aria-label="Remove Ingredient" />
-        </Button>
+        <div className="-ml-3">
+          <Button
+            variant="ghost"
+            onClick={() => {
+              dispatch({
+                type: 'DELETE_INGREDIENT',
+                payload: { id: ingredient.id },
+              });
+            }}
+            aria-label="Delete Ingredient"
+            size="icon"
+          >
+            <DeleteIcon aria-label="Remove Ingredient" className="h-4 w-4" />
+          </Button>
+        </div>
         <div className="flex-1">
-          <TextField.Input
+          <Input
             value={ingredient.name}
             onChange={(name) => {
               dispatch({
@@ -336,8 +345,8 @@ function Ingredient({ id }: IngredientProps) {
         </div>
       </div>
       <div className="flex-[1]">
-        <TextField.Root>
-          <TextField.Input
+        <InputContainer>
+          <Input
             type="number"
             value={ingredient.percent}
             onChange={(percent) => {
@@ -349,16 +358,16 @@ function Ingredient({ id }: IngredientProps) {
                 },
               });
             }}
-            align="right"
+            className="text-right"
             min="0"
             aria-label="Ingredient Percent"
           />
-          <TextField.Slot>%</TextField.Slot>
-        </TextField.Root>
+          <InputSlot>%</InputSlot>
+        </InputContainer>
       </div>
       <div className="flex-[1]">
-        <TextField.Root>
-          <TextField.Input
+        <InputContainer>
+          <Input
             type="number"
             value={ingredient.weight}
             onChange={(weight) => {
@@ -370,12 +379,12 @@ function Ingredient({ id }: IngredientProps) {
                 },
               });
             }}
-            align="right"
+            className="text-right"
             min="0"
             aria-label="Ingredient Weight"
           />
-          <TextField.Slot>g</TextField.Slot>
-        </TextField.Root>
+          <InputSlot>g</InputSlot>
+        </InputContainer>
       </div>
     </div>
   );
@@ -404,8 +413,8 @@ function Levain() {
           <Heading level="4">Levain</Heading>
         </label>
         <div className="flex-[1]">
-          <TextField.Root>
-            <TextField.Input
+          <InputContainer>
+            <Input
               id={inputID}
               type="number"
               value={levain.percent}
@@ -415,15 +424,15 @@ function Levain() {
                   payload: { percent },
                 });
               }}
-              align="right"
+              className="text-right"
               min="0"
             />
-            <TextField.Slot>%</TextField.Slot>
-          </TextField.Root>
+            <InputSlot>%</InputSlot>
+          </InputContainer>
         </div>
         <div className="flex-[1]">
-          <TextField.Root>
-            <TextField.Input
+          <InputContainer>
+            <Input
               type="number"
               value={levain.weight}
               onChange={(weight) => {
@@ -432,12 +441,12 @@ function Levain() {
                   payload: { weight },
                 });
               }}
-              align="right"
+              className="text-right"
               min="0"
               aria-label="Levain Weight"
             />
-            <TextField.Slot>g</TextField.Slot>
-          </TextField.Root>
+            <InputSlot>g</InputSlot>
+          </InputContainer>
         </div>
       </div>
       {flourIngredientIDs.length > 0 && (
@@ -466,23 +475,26 @@ function Levain() {
       )}
       <div className="flex justify-end gap-4">
         <Button
+          variant="outline"
           onClick={() => {
             dispatch({
               type: 'DELETE_LEVAIN',
             });
           }}
         >
-          <MinusCircledIcon className="mr-1" />
+          <DeleteIcon className="mr-2 h-4 w-4" />
           Delete
         </Button>
-        <DropdownMenu.Root>
-          <DropdownMenu.Trigger>
-            <PlusCircledIcon className="mr-1" />
-            Add Ingredient
-          </DropdownMenu.Trigger>
-          <DropdownMenu.Portal>
-            <DropdownMenu.Content align="end">
-              <DropdownMenu.Item
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline">
+              <PlusIcon className="mr-1 h-4 w-4" />
+              Add Ingredient
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuPortal>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem
                 onClick={() => {
                   dispatch({
                     type: 'ADD_LEVAIN_FLOUR_INGREDIENT',
@@ -491,8 +503,8 @@ function Levain() {
                 }}
               >
                 Flour
-              </DropdownMenu.Item>
-              <DropdownMenu.Item
+              </DropdownMenuItem>
+              <DropdownMenuItem
                 onClick={() => {
                   dispatch({
                     type: 'ADD_LEVAIN_LIQUID_INGREDIENT',
@@ -501,8 +513,8 @@ function Levain() {
                 }}
               >
                 Liquid
-              </DropdownMenu.Item>
-              <DropdownMenu.Item
+              </DropdownMenuItem>
+              <DropdownMenuItem
                 onClick={() => {
                   dispatch({
                     type: 'ADD_LEVAIN_OTHER_INGREDIENT',
@@ -511,10 +523,10 @@ function Levain() {
                 }}
               >
                 Other
-              </DropdownMenu.Item>
-            </DropdownMenu.Content>
-          </DropdownMenu.Portal>
-        </DropdownMenu.Root>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenuPortal>
+        </DropdownMenu>
       </div>
     </div>
   );

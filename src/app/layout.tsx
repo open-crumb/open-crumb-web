@@ -1,10 +1,14 @@
-import './globals.css';
+import '@/app/globals.css';
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Inter as FontSans } from 'next/font/google';
 import NavigationMenuBlock from '@/ui/core/navigation/NavigationMenuBlock';
 import { ApplicationProvider } from '@/ui/core/ApplicationContext';
+import { cn } from '@/lib/shadcn';
 
-const inter = Inter({ subsets: ['latin'] });
+const fontSans = FontSans({
+  subsets: ['latin'],
+  variable: '--font-sans',
+});
 
 export const metadata: Metadata = {
   title: 'Open Crumb',
@@ -17,8 +21,13 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="text-gray-900">
-      <body className={inter.className}>
+    <html lang="en">
+      <body
+        className={cn(
+          'min-h-screen bg-background font-sans antialiased',
+          fontSans.variable,
+        )}
+      >
         <div className="container">
           <ApplicationProvider>
             <NavigationMenuBlock isSignedIn={false} />

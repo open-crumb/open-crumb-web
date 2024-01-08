@@ -11,10 +11,10 @@ import {
   useLogbookEntry,
 } from '@/ui/core/logbook/LogbookContext';
 import LogbookUpdate from '@/ui/core/logbook/entry/LogbookUpdate';
-import TextField from '@/ui/design/TextField';
-import TextArea from '@/ui/design/TextArea';
-import Button from '@/ui/design/Button';
-import { PlusIcon } from '@radix-ui/react-icons';
+import { Input } from '@/ui/design/input';
+import { Textarea } from '@/ui/design/textarea';
+import { Button } from '@/ui/design/button';
+import { PlusIcon } from 'lucide-react';
 
 type Props = {
   id: string;
@@ -25,8 +25,8 @@ export default function LogbookEntryBlock(props: Props) {
   const { createUpdate, setEntry } = useLogbookActions();
 
   return (
-    <>
-      <TextField.Input
+    <div className="mb-8 mt-4">
+      <Input
         value={entry.entity.title}
         onChange={(title) => {
           setEntry({
@@ -36,7 +36,7 @@ export default function LogbookEntryBlock(props: Props) {
         }}
         variant="title"
       />
-      <TextArea
+      <Textarea
         value={entry.entity.description}
         onChange={(description) => {
           setEntry({
@@ -47,17 +47,18 @@ export default function LogbookEntryBlock(props: Props) {
         placeholder="Description"
       />
       <Button
+        variant="outline"
         onClick={() => {
           createUpdate({ entryID: entry.id });
         }}
       >
-        <PlusIcon className="mr-1" /> New Update
+        <PlusIcon className="mr-1 h-4 w-4" /> New Update
       </Button>
       {entry.references.updates.ids.map((id) => (
         <div key={id} className="mt-8">
           <LogbookUpdate id={id} />
         </div>
       ))}
-    </>
+    </div>
   );
 }

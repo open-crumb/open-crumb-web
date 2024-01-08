@@ -3,10 +3,17 @@ import {
   useLogbookActions,
   useLogbookIngredient,
 } from '@/ui/core/logbook/LogbookContext';
-import Button from '@/ui/design/Button';
-import Select from '@/ui/design/Select';
-import TextField from '@/ui/design/TextField';
-import { Cross1Icon } from '@radix-ui/react-icons';
+import { Button } from '@/ui/design/button';
+import { Input } from '@/ui/design/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/ui/design/select';
+import { IngredientUnit } from '@/ui/graphql/graphql';
+import { X as DeleteIcon } from 'lucide-react';
 
 type Props = {
   id: string;
@@ -18,8 +25,8 @@ export default function LogbookIngredient(props: Props) {
 
   return (
     <div className="flex items-center gap-2">
-      <div className="flex-[4]">
-        <TextField.Input
+      <div className="flex-[3]">
+        <Input
           value={ingredient.entity.name}
           onChange={(name) => {
             setIngredient({
@@ -31,7 +38,7 @@ export default function LogbookIngredient(props: Props) {
         />
       </div>
       <div className="flex-[1]">
-        <TextField.Input
+        <Input
           type="number"
           value={ingredient.entity.quantity}
           onChange={(quantity) => {
@@ -41,36 +48,40 @@ export default function LogbookIngredient(props: Props) {
             });
           }}
           placeholder="50"
-          align="right"
+          className="text-right"
         />
       </div>
       <div className="flex-[1]">
-        <Select.Root
+        <Select
           value={ingredient.entity.unit}
           onValueChange={(unit) => {
             setIngredient({
               id: props.id,
-              unit,
+              unit: unit as IngredientUnit,
             });
           }}
         >
-          <Select.Trigger />
-          <Select.Content>
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
             {INGREDIENT_UNITS.map(({ value, text }) => (
-              <Select.Item key={value} value={value}>
+              <SelectItem key={value} value={value}>
                 {text}
-              </Select.Item>
+              </SelectItem>
             ))}
-          </Select.Content>
-        </Select.Root>
+          </SelectContent>
+        </Select>
       </div>
       <div className="flex-shrink">
         <Button
+          variant="ghost"
           onClick={() => {
             deleteIngredient({ id: props.id });
           }}
+          size="icon"
         >
-          <Cross1Icon aria-label="Delete Ingredient" />
+          <DeleteIcon aria-label="Delete Ingredient" className="h-4 w-4" />
         </Button>
       </div>
     </div>

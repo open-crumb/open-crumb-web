@@ -57,7 +57,6 @@ builder.mutationField('setLogbookMeasurement', (t) =>
       }),
     },
     async resolve(root, args, context) {
-      console.log('DEBUG', args);
       const measurement = await context.dataSources.logbook.setMeasurement({
         id: args.id.id,
         ...(typeof args.name === 'string' && { name: args.name }),

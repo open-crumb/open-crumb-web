@@ -1,7 +1,7 @@
 import { useContext } from 'react';
 import CalculatorContext from '@/ui/core/calculator/CalculatorContext';
-import Separator from '@/ui/design/Separator';
-import Button from '@/ui/design/Button';
+import { Separator } from '@/ui/design/separator';
+import { Button } from '@/ui/design/button';
 import Heading from '@/ui/design/Heading';
 import {
   applyMultiplier,
@@ -143,6 +143,7 @@ export default function CalculatorDisplay() {
       </div>
       <div className="mt-2 flex justify-end">
         <Button
+          variant="outline"
           onClick={() => {
             dispatch({ type: 'BACK_CLICKED' });
           }}
