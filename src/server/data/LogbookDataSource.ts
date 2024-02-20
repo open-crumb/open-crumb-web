@@ -322,8 +322,8 @@ export default class LogbookDataSource {
   async createIngredient(options: {
     updateID: string;
     name?: string;
-    quantity?: number;
-    unit?: LogbookIngredientUnit;
+    quantity?: number | null;
+    unit?: LogbookIngredientUnit | null;
   }): Promise<LogbookIngredientModel> {
     const update = e.select(e.LogbookUpdate, (update) => ({
       filter_single: e.op(update.id, '=', e.uuid(options.updateID)),
@@ -353,8 +353,8 @@ export default class LogbookDataSource {
   async setIngredient(options: {
     id: string;
     name?: string;
-    quantity?: number;
-    unit?: LogbookIngredientUnit;
+    quantity?: number | null;
+    unit?: LogbookIngredientUnit | null;
   }): Promise<LogbookIngredientModel | null> {
     const ingredient = e.update(e.LogbookIngredient, (ingredient) => ({
       set: {
@@ -457,8 +457,8 @@ export default class LogbookDataSource {
   async createMeasurement(options: {
     updateID: string;
     name?: string;
-    value?: number;
-    unit?: LogbookMeasurementUnit;
+    value?: number | null;
+    unit?: LogbookMeasurementUnit | null;
   }): Promise<LogbookMeasurementModel> {
     const update = e.select(e.LogbookUpdate, (update) => ({
       filter_single: e.op(update.id, '=', e.uuid(options.updateID)),
@@ -488,8 +488,8 @@ export default class LogbookDataSource {
   async setMeasurement(options: {
     id: string;
     name?: string;
-    value?: number;
-    unit?: LogbookMeasurementUnit;
+    value?: number | null;
+    unit?: LogbookMeasurementUnit | null;
   }): Promise<LogbookMeasurementModel | null> {
     const measurement = e.update(e.LogbookMeasurement, (measurement) => ({
       set: {

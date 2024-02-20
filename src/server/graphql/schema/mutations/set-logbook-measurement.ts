@@ -51,19 +51,28 @@ builder.mutationField('setLogbookMeasurement', (t) =>
         required: true,
       }),
       name: t.arg.string(),
-      value: t.arg.float(),
+      value: t.arg.float({
+        description: `
+          Leave this arg undefined to avoid setting a value. Explicitly sending
+          \`null\` for this arg will persist it as \`null\`.
+        `,
+      }),
       unit: t.arg({
         type: MeasurementUnit,
+        description: `
+          Leave this arg undefined to avoid setting a value. Explicitly sending
+          \`null\` for this arg will persist it as \`null\`.
+        `,
       }),
     },
     async resolve(root, args, context) {
       const measurement = await context.dataSources.logbook.setMeasurement({
         id: args.id.id,
         ...(typeof args.name === 'string' && { name: args.name }),
-        ...(typeof args.value === 'number' && {
+        ...(typeof args.value !== 'undefined' && {
           value: args.value,
         }),
-        ...(args.unit && { unit: args.unit }),
+        ...(typeof args.unit !== 'undefined' && { unit: args.unit }),
       });
 
       return measurement

@@ -6,7 +6,7 @@ const CreateLogbookMeasurementSuccess = builder.simpleObject(
   'CreateLogbookMeasurementSuccess',
   {
     fields: (t) => ({
-      ingredient: t.field({
+      measurement: t.field({
         type: LogbookMeasurementType,
       }),
     }),
@@ -51,22 +51,31 @@ builder.mutationField('createLogbookMeasurement', (t) =>
         required: true,
       }),
       name: t.arg.string(),
-      value: t.arg.float(),
+      value: t.arg.float({
+        description: `
+          Leave this arg undefined to avoid setting a value. Explicitly sending
+          \`null\` for this arg will persist it as \`null\`.
+        `,
+      }),
       unit: t.arg({
         type: MeasurementUnit,
+        description: `
+          Leave this arg undefined to avoid setting a value. Explicitly sending
+          \`null\` for this arg will persist it as \`null\`.
+        `,
       }),
     },
     async resolve(root, args, context) {
-      const ingredient = await context.dataSources.logbook.createMeasurement({
+      const measurement = await context.dataSources.logbook.createMeasurement({
         updateID: args.updateID.id,
         ...(typeof args.name === 'string' && { name: args.name }),
-        ...(typeof args.value === 'number' && {
+        ...(typeof args.value !== 'undefined' && {
           description: args.value,
         }),
-        ...(args.unit && { unit: args.unit }),
+        ...(typeof args.unit !== 'undefined' && { unit: args.unit }),
       });
 
-      return { ingredient };
+      return { measurement };
     },
   }),
 );

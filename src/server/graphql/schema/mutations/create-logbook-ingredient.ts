@@ -51,19 +51,28 @@ builder.mutationField('createLogbookIngredient', (t) =>
         required: true,
       }),
       name: t.arg.string(),
-      quantity: t.arg.float(),
+      quantity: t.arg.float({
+        description: `
+          Leave this arg undefined to avoid setting a value. Explicitly sending
+          \`null\` for this arg will persist it as \`null\`.
+        `,
+      }),
       unit: t.arg({
         type: IngredientUnit,
+        description: `
+          Leave this arg undefined to avoid setting a value. Explicitly sending
+          \`null\` for this arg will persist it as \`null\`.
+        `,
       }),
     },
     async resolve(root, args, context) {
       const ingredient = await context.dataSources.logbook.createIngredient({
         updateID: args.updateID.id,
         ...(typeof args.name === 'string' && { name: args.name }),
-        ...(typeof args.quantity === 'number' && {
+        ...(typeof args.quantity !== 'undefined' && {
           description: args.quantity,
         }),
-        ...(args.unit && { unit: args.unit }),
+        ...(typeof args.unit !== 'undefined' && { unit: args.unit }),
       });
 
       return { ingredient };
