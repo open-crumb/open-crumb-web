@@ -66,7 +66,6 @@ builder.mutationField('setLogbookIngredient', (t) =>
       }),
     },
     async resolve(root, args, context) {
-      console.log('DEBUG', args);
       const ingredient = await context.dataSources.logbook.setIngredient({
         id: args.id.id,
         ...(typeof args.name === 'string' && { name: args.name }),

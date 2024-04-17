@@ -1,5 +1,7 @@
 import { IngredientUnit, MeasurementUnit } from '@/ui/graphql/graphql';
 
+export type { IngredientUnit, MeasurementUnit };
+
 export const INGREDIENT_UNITS: Array<{
   value: IngredientUnit;
   text: string;
@@ -37,12 +39,12 @@ export const INGREDIENT_UNITS: Array<{
     text: 'tbsp',
   },
   {
-    value: 'VolumeCup',
-    text: 'cup',
-  },
-  {
     value: 'VolumePint',
     text: 'pt',
+  },
+  {
+    value: 'VolumeCup',
+    text: 'cup',
   },
   {
     value: 'VolumeQuart',

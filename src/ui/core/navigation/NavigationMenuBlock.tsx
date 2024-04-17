@@ -12,6 +12,7 @@ export default function NavigationMenuBlock(props: Props) {
     <nav className="flex gap-4">
       <Link href="/">Home</Link>
       <Link href="/logbook">Logbook</Link>
+      <Link href="/recipes">Recipes</Link>
       <Link href="/calculator">Calculator</Link>
       {!props.isSignedIn && <Link href="/api/auth/sign-in">Sign In</Link>}
       {props.isSignedIn && <Link href="/api/auth/sign-out">Sign Out</Link>}

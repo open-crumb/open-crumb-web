@@ -1,5 +1,6 @@
 /**
- * Removes an item from a record by key. Example:
+ * Removes an item from a record by key. Returns a new record, does not mutate
+ * the input record. Example:
  *
  * ```
  * > removeRecordItem<string, string>(
@@ -31,7 +32,7 @@ export default function removeRecordItem<K extends string | number | symbol, V>(
 
 /**
  * Removes multiple items from a record given an array of the keys to remove.
- * Example:
+ * Returns a new record, does not mutate the input record. Example:
  *
  * ```
  * > removeRecordItems<string, string>(
