@@ -5,10 +5,12 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "postbuild": "node ./scripts/add-urls-to-kinde.js",
     "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {
+    "@kinde-oss/kinde-auth-nextjs": "2.3.6",
     "@radix-ui/react-navigation-menu": "1.2.0",
     "class-variance-authority": "0.7.0",
     "clsx": "2.1.1",
