@@ -2,27 +2,27 @@ import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { redirect } from "next/navigation";
 
 export default async function DashboardLayout({
-  children,
+	children,
 }: Readonly<{
-  children: React.ReactNode;
+	children: React.ReactNode;
 }>) {
-  const data = await getData();
+	const data = await getData();
 
-  if (!data.isAuthenticated) {
-    redirect("/api/auth/login");
-  }
+	if (!data.isAuthenticated) {
+		redirect("/api/auth/login");
+	}
 
-  return children;
+	return children;
 }
 
 type DashboardLayoutData = {
-  isAuthenticated: boolean;
+	isAuthenticated: boolean;
 };
 
 async function getData(): Promise<DashboardLayoutData> {
-  const { isAuthenticated } = getKindeServerSession();
+	const { isAuthenticated } = getKindeServerSession();
 
-  return {
-    isAuthenticated: await isAuthenticated(),
-  };
+	return {
+		isAuthenticated: await isAuthenticated(),
+	};
 }
