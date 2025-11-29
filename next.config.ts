@@ -1,5 +1,6 @@
-/** @type {import('next').NextConfig} */
-const nextConfig = {
+import type { NextConfig } from "next";
+
+const nextConfig: NextConfig = {
 	env: {
 		/**
 		 * @see https://docs.kinde.com/developer-tools/sdks/backend/nextjs-sdk/#working-with-preview-urls

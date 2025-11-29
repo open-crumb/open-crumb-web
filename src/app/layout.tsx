@@ -28,9 +28,9 @@ export default async function RootLayout({
 
 	return (
 		<html lang="en">
-			<body className={cn("antialiased font-sans", fontSans.variable)}>
+			<body className={cn("font-sans antialiased", fontSans.variable)}>
 				<Header isAuthenticated={data.isAuthenticated} />
-				<main className="container my-md">{children}</main>
+				<main className="my-md container">{children}</main>
 			</body>
 		</html>
 	);
@@ -44,6 +44,6 @@ async function getData(): Promise<RootLayoutData> {
 	const { isAuthenticated } = getKindeServerSession();
 
 	return {
-		isAuthenticated: await isAuthenticated(),
+		isAuthenticated: (await isAuthenticated()) ?? false,
 	};
 }

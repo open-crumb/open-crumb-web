@@ -23,6 +23,6 @@ async function getData(): Promise<DashboardLayoutData> {
 	const { isAuthenticated } = getKindeServerSession();
 
 	return {
-		isAuthenticated: await isAuthenticated(),
+		isAuthenticated: (await isAuthenticated()) ?? false,
 	};
 }

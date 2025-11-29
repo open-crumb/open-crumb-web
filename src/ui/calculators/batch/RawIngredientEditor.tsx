@@ -52,7 +52,7 @@ export default function RawIngredientEditor({
 				</IngredientInput>
 			</IngredientContainer>
 			<ExpandableIngredientContent>
-				<div className="flex justify-end mt-md">
+				<div className="mt-md flex justify-end">
 					<Button variant="destructive" onClick={() => onDelete()}>
 						Delete
 					</Button>
