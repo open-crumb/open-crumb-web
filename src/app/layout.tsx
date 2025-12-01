@@ -4,6 +4,7 @@ import "./globals.css";
 import { cn } from "@/lib/utils";
 import Header from "@/ui/header/Header";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
+import AuthProvider from "@/ui/AuthProvider";
 
 /**
  * @see https://ui.shadcn.com/docs/installation/next
@@ -29,8 +30,10 @@ export default async function RootLayout({
 	return (
 		<html lang="en">
 			<body className={cn("font-sans antialiased", fontSans.variable)}>
-				<Header isAuthenticated={data.isAuthenticated} />
-				<main className="my-md container">{children}</main>
+				<AuthProvider>
+					<Header isAuthenticated={data.isAuthenticated} />
+					<main className="my-md container">{children}</main>
+				</AuthProvider>
 			</body>
 		</html>
 	);
