@@ -32,7 +32,7 @@ export default function ScaleEditor({ scale, onScaleChange, isValid }: Props) {
 					onChange={(event) => onScaleChange(event.target.value)}
 					isValid={isValid}
 					min="1"
-					after={<XIcon className="w-3 h-3" />}
+					after={<XIcon className="h-3 w-3" />}
 				/>
 			</IngredientInput>
 		</IngredientContainer>

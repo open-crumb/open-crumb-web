@@ -7,7 +7,7 @@ type RowProps = {
 
 export function Row({ className, children }: RowProps) {
 	return (
-		<div className={cn("flex gap-md items-center", className)}>{children}</div>
+		<div className={cn("gap-md flex items-center", className)}>{children}</div>
 	);
 }
 

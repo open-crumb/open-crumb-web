@@ -1,9 +1,5 @@
 import { Link } from "@/ui/design/link";
-// import {
-// 	LoginLink,
-// 	LogoutLink,
-// 	RegisterLink,
-// } from "@kinde-oss/kinde-auth-nextjs/components";
+import { Button } from "@/ui/design/button";
 import {
 	NavigationMenu,
 	NavigationMenuItem,
@@ -11,12 +7,14 @@ import {
 	NavigationMenuList,
 	navigationMenuTriggerStyle,
 } from "@/ui/design/navigation-menu";
+import { signOutAction } from "@/ui/auth/actions";
 
 type Props = {
+	isSignUpEnabled: boolean;
 	isAuthenticated: boolean;
 };
 
-export default function Header(props: Props) {
+export default function Header({ isSignUpEnabled, isAuthenticated }: Props) {
 	return (
 		<div className="container">
 			<NavigationMenu className="-mx-md">
@@ -29,6 +27,16 @@ export default function Header(props: Props) {
 							<Link href="/">Open Crumb</Link>
 						</NavigationMenuLink>
 					</NavigationMenuItem>
+					{isAuthenticated && (
+						<NavigationMenuItem>
+							<NavigationMenuLink
+								className={navigationMenuTriggerStyle()}
+								asChild
+							>
+								<Link href="/dashboard">Dashboard</Link>
+							</NavigationMenuLink>
+						</NavigationMenuItem>
+					)}
 					<NavigationMenuItem>
 						<NavigationMenuLink
 							className={navigationMenuTriggerStyle()}
@@ -37,31 +45,41 @@ export default function Header(props: Props) {
 							<Link href="/calculators">Calculators</Link>
 						</NavigationMenuLink>
 					</NavigationMenuItem>
+					{isAuthenticated && (
+						<NavigationMenuItem>
+							<form action={signOutAction}>
+								<NavigationMenuLink
+									className={navigationMenuTriggerStyle()}
+									asChild
+								>
+									<Button type="submit" variant="link">
+										Sign Out
+									</Button>
+								</NavigationMenuLink>
+							</form>
+						</NavigationMenuItem>
+					)}
+					{!isAuthenticated && (
+						<NavigationMenuItem>
+							<NavigationMenuLink
+								className={navigationMenuTriggerStyle()}
+								asChild
+							>
+								<Link href="/sign-in">Sign In</Link>
+							</NavigationMenuLink>
+						</NavigationMenuItem>
+					)}
+					{isSignUpEnabled && (
+						<NavigationMenuItem>
+							<NavigationMenuLink
+								className={navigationMenuTriggerStyle()}
+								asChild
+							>
+								<Link href="/sign-up">Sign Up</Link>
+							</NavigationMenuLink>
+						</NavigationMenuItem>
+					)}
 				</NavigationMenuList>
-				{/* {!props.isAuthenticated && (
-          <NavigationMenuList>
-            <NavigationMenuItem>
-              <NavigationMenuLink
-                className={navigationMenuTriggerStyle()}
-                asChild
-              >
-                <LoginLink>Sign In</LoginLink>
-              </NavigationMenuLink>
-            </NavigationMenuItem>
-          </NavigationMenuList>
-        )}
-        {props.isAuthenticated && (
-          <NavigationMenuList>
-            <NavigationMenuItem>
-              <NavigationMenuLink
-                className={navigationMenuTriggerStyle()}
-                asChild
-              >
-                <LogoutLink>Sign Out</LogoutLink>
-              </NavigationMenuLink>
-            </NavigationMenuItem>
-          </NavigationMenuList>
-        )} */}
 			</NavigationMenu>
 		</div>
 	);

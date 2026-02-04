@@ -69,7 +69,7 @@ export default function BatchCalculatorEditor() {
 	const setStep = useStore((state) => state.setStep);
 
 	return (
-		<div className="flex flex-col gap-md">
+		<div className="gap-md flex flex-col">
 			<NameEditor name={name} onNameChange={setName} />
 			<TargetHydrationPercentEditor
 				percent={targetHydrationPercent}

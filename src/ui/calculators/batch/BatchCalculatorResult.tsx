@@ -21,8 +21,8 @@ export default function BatchCalculatorResult() {
 	});
 
 	return (
-		<div className="flex flex-col gap-md">
-			<h2 className="font-semibold text-lg">{result.name}</h2>
+		<div className="gap-md flex flex-col">
+			<h2 className="text-lg font-semibold">{result.name}</h2>
 			<Row>
 				<Column size="3/4">Portion</Column>
 				<Column size="1/4" className="text-right">
@@ -39,7 +39,7 @@ export default function BatchCalculatorResult() {
 				<Column size="3/4">Scale</Column>
 				<Column size="1/4" className="text-right">
 					{result.scale}
-					<span className="ml-1 text-muted-foreground">×</span>
+					<span className="text-muted-foreground ml-1">×</span>
 				</Column>
 			</Row>
 			<Separator />
@@ -76,7 +76,7 @@ export default function BatchCalculatorResult() {
 					/>
 				</Fragment>
 			))}
-			<div className="flex justify-end mt-md">
+			<div className="mt-md flex justify-end">
 				<Button onClick={() => setStep("EDIT")}>Back</Button>
 			</div>
 		</div>

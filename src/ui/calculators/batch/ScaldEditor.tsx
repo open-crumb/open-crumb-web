@@ -78,7 +78,7 @@ export default function ScaldEditor({
 						/>
 					</IngredientInput>
 				</IngredientContainer>
-				<div className="flex justify-end mt-md">
+				<div className="mt-md flex justify-end">
 					<Button variant="destructive" onClick={() => onDelete()}>
 						Delete
 					</Button>

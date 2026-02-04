@@ -34,7 +34,7 @@ export function IngredientLabel({
 			<Label htmlFor={htmlFor}>
 				{children}
 				{!isValid && (
-					<CircleAlertIcon className="w-4 h-4 inline-block ml-sm text-destructive" />
+					<CircleAlertIcon className="ml-sm text-destructive inline-block h-4 w-4" />
 				)}
 			</Label>
 		</Column>
@@ -90,12 +90,12 @@ export function ExpandableIngredientLabel({
 
 	return (
 		<Column size="3/4">
-			<div className="flex gap-md items-center">
+			<div className="gap-md flex items-center">
 				<div className="flex-1">
 					<Label htmlFor={toggleButtonID}>
 						{children}
 						{!isValid && (
-							<CircleAlertIcon className="w-4 h-4 inline-block ml-sm text-destructive" />
+							<CircleAlertIcon className="ml-sm text-destructive inline-block h-4 w-4" />
 						)}
 					</Label>
 				</div>
@@ -109,13 +109,13 @@ export function ExpandableIngredientLabel({
 						{!isExpanded && (
 							<>
 								<span className="sr-only">Expand</span>
-								<EditIcon className="w-4 h-4" />
+								<EditIcon className="h-4 w-4" />
 							</>
 						)}
 						{isExpanded && (
 							<>
 								<span className="sr-only">Minimize</span>
-								<ChevronsDownUpIcon className="w-4 h-4" />
+								<ChevronsDownUpIcon className="h-4 w-4" />
 							</>
 						)}
 					</Button>

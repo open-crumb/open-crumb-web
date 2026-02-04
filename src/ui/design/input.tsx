@@ -16,7 +16,7 @@ export function Input({
 		<div className={cn("relative")}>
 			<input
 				className={cn(
-					"h-10 w-full rounded-md border bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
+					"bg-background ring-offset-background placeholder:text-muted-foreground h-10 w-full rounded-md border px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-hidden disabled:cursor-not-allowed disabled:opacity-50",
 					{
 						"border-input": isValid,
 						"focus-visible:ring-ring": isValid,
@@ -29,7 +29,7 @@ export function Input({
 				{...props}
 			/>
 			{after && (
-				<div className="absolute text-muted-foreground top-[50%] -translate-y-[50%] right-2">
+				<div className="text-muted-foreground absolute top-[50%] right-2 -translate-y-[50%]">
 					{after}
 				</div>
 			)}

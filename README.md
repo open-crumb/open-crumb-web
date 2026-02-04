@@ -11,5 +11,7 @@ The technologies currently used are:
 - [Next.js](https://nextjs.org/docs)
 - [Tailwindcss](https://tailwindcss.com/docs)
 - [Shadcn](https://ui.shadcn.com/docs)
+- [Prisma](https://www.prisma.io/docs/guides/nextjs)
+- [Better Auth](https://www.better-auth.com/docs/integrations/next)
 
 No license has been chosen for this project yet.
