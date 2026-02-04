@@ -2,7 +2,9 @@
 // npm install --save-dev prisma dotenv
 import { defineConfig } from "prisma/config";
 
-process.loadEnvFile(".env.local");
+if (!process.env.VERCEL) {
+	process.loadEnvFile(".env.local");
+}
 
 export default defineConfig({
 	schema: "prisma/schema.prisma",
