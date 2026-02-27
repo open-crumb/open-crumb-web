@@ -19,8 +19,8 @@ npm run build        # Production build (runs prisma generate first)
 npm run lint         # Run ESLint
 npm run test         # Run Jest tests
 npm run format       # Format code with Prettier
+npm run migrate      # Create and apply database migrations
 npx prisma studio    # Open Prisma Studio (database GUI)
-npx prisma migrate dev  # Create and apply migrations
 ```
 
 ### Key Directories
@@ -31,8 +31,6 @@ npx prisma migrate dev  # Create and apply migrations
 
 ### Path Aliases
 - `@/*` resolves to `src/*` (e.g., `@/lib/auth`, `@/ui/design/button`)
-- `@ui/*` resolves to `src/ui/design/*` (Shadcn components)
-- `@components/*` resolves to `src/ui/*` (all components)
 
 ## Technology Stack
 
@@ -56,7 +54,6 @@ npx prisma migrate dev  # Create and apply migrations
 
 ### State & Data
 - **Zustand 5.0.11** - Lightweight state management (used minimally)
-- **neverthrow 8.2.0** - Functional error handling with Result types
 
 ### Testing & Quality
 - **Jest 30.2.0** - Test runner with jsdom environment
@@ -269,7 +266,7 @@ feature/
 "use client"; // Only if needed
 
 import { /* ... */ } from "@/lib/...";
-import { Button } from "@ui/button";
+import { Button } from "@/ui/design/button";
 
 interface MyComponentProps {
   title: string;
@@ -398,16 +395,16 @@ All design system components are in `src/ui/design/`:
 
 | Component | Import | Purpose |
 |-----------|--------|---------|
-| Button | `@ui/button` | Primary actions, links, variants |
-| Input | `@ui/input` | Text inputs with after slot |
-| Label | `@ui/label` | Accessible form labels |
-| Field | `@ui/field` | Form field wrapper with errors |
-| Link | `@ui/link` | Next.js Link with styling |
-| DropdownMenu | `@ui/dropdown-menu` | Context menus |
-| Select | `@ui/select` | Accessible dropdowns |
-| NavigationMenu | `@ui/navigation-menu` | Header navigation |
-| Separator | `@ui/separator` | Visual dividers |
-| Badge | `@ui/badge` | Small status indicators |
+| Button | `@/ui/design/button` | Primary actions, links, variants |
+| Input | `@/ui/design/input` | Text inputs with after slot |
+| Label | `@/ui/design/label` | Accessible form labels |
+| Field | `@/ui/design/field` | Form field wrapper with errors |
+| Link | `@/ui/design/link` | Next.js Link with styling |
+| DropdownMenu | `@/ui/design/dropdown-menu` | Context menus |
+| Select | `@/ui/design/select` | Accessible dropdowns |
+| NavigationMenu | `@/ui/design/navigation-menu` | Header navigation |
+| Separator | `@/ui/design/separator` | Visual dividers |
+| Badge | `@/ui/design/badge` | Small status indicators |
 
 ### Adding New Shadcn Components
 
@@ -429,8 +426,8 @@ This will:
 The `Field` component provides a consistent form field layout:
 
 ```tsx
-import { Field, FieldLabel, FieldError } from "@ui/field";
-import { Input } from "@ui/input";
+import { Field, FieldLabel, FieldError } from "@/ui/design/field";
+import { Input } from "@/ui/design/input";
 
 <Field variant="vertical">
   <FieldLabel>Email</FieldLabel>
@@ -654,9 +651,9 @@ export async function myAction(
 
 import { useActionState } from "react";
 import { myAction } from "./actions";
-import { Field, FieldLabel, FieldError } from "@ui/field";
-import { Input } from "@ui/input";
-import { Button } from "@ui/button";
+import { Field, FieldLabel, FieldError } from "@/ui/design/field";
+import { Input } from "@/ui/design/input";
+import { Button } from "@/ui/design/button";
 
 export function MyForm() {
   const [state, action] = useActionState(myAction, { errors: {} });
