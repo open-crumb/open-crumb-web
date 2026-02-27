@@ -146,7 +146,7 @@ const users = await prisma.user.findMany();
 
 **Migration Workflow**:
 1. Edit `prisma/schema.prisma`
-2. Run `npx prisma migrate dev --name description`
+2. Run `npm run migrate`
 3. Prisma Client regenerates automatically
 4. Commit both schema and migration files
 
@@ -559,7 +559,7 @@ model User {
 
 3. **Create Migration**:
 ```bash
-npx prisma migrate dev --name add_recipe_model
+npm run migrate
 ```
 
 4. **Use in Code**:
@@ -825,7 +825,7 @@ npm install
 createdb opencrumb
 
 # Run migrations
-npx prisma migrate dev
+npm run migrate
 ```
 
 3. **Start Development Server**:
