@@ -1,5 +1,7 @@
+import "server-only";
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
+import { organization } from "better-auth/plugins";
 import { nextCookies } from "better-auth/next-js";
 import prisma from "@/lib/prisma";
 import { cache } from "react";
@@ -14,7 +16,7 @@ export const auth = betterAuth({
 	experimental: {
 		joins: true,
 	},
-	plugins: [nextCookies()],
+	plugins: [organization(), nextCookies()],
 	emailAndPassword: {
 		enabled: true,
 		disableSignUp: !SIGN_UP_ENABLED,
